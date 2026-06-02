@@ -20,6 +20,7 @@ let state = {
 
 function getNodeColor(n,r){if(n&&n.dominantElement&&ELEM_COLORS[n.dominantElement])return ELEM_COLORS[n.dominantElement];return r?r.color:'#888';}
 function getNodeDominantCn(n,r){if(n&&n.dominantElement&&ELEM_CN[n.dominantElement])return ELEM_CN[n.dominantElement];return r?r.dominantElementCn:'—';}
+function drawTrendChart(){const canvas=document.getElementById('trend-canvas');if(!canvas)return;const ids=state.nodeIds;if(!ids||ids.length<2)return;const run=RUN_DATA[state.runId];if(!run)return;const data=[];for(const id of ids){const nd=run.nodes[id];if(!nd||!nd.fiveAxis)continue;const w=deriveElemWeights(nd.fiveAxis);if(w)data.push(w);}if(data.length>=2)drawTrend(canvas,data,ELEM_COLORS);}
 
 const AGE_MAP={childhood:'幼年',youth:'青年',stable:'稳定','中年':'中年','稳定':'稳定','':'—'};const AXIS_CN   = {attachment:'依恋',trust:'信任',stability:'稳定',energy:'能量',curiosity:'好奇'};
 
