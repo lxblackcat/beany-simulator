@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐾 Beany 模拟器 — 游戏</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="data/run-data.js"></script>
+</head>
+<body>
+  <div class="game-container">
+    
+    <!-- ======== Left: Story Panel ======== -->
+    <div class="story-panel">
+      
+      <!-- Beany Animation Stage -->
+      <div class="beany-stage" id="beany-stage">
+        <!-- Beany circle rendered by JS -->
+      </div>
+      
+      <!-- Scene Header -->
+      <div class="scene-header" id="scene-header">
+        <div class="scene-day">加载中…</div>
+        <div class="scene-dm">🎬 场景加载中…</div>
+      </div>
+      
+      <!-- Story Area (rounds) -->
+      <div class="story-area" id="story-area">
+        <div style="text-align:center;padding:2rem;color:var(--text-muted)">加载互动数据…</div>
+      </div>
+      
+      <!-- Controls Bar -->
+      <div class="controls-bar">
+        <button onclick="prevNode()" id="prev-node-btn" title="上一个节点 (←)">◀ 上一节点</button>
+        <span class="node-progress" id="node-progress">0/0 互动</span>
+        <div id="day-nav" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center"></div>
+        <div style="display:flex;gap:0.5rem">
+          <button onclick="toggleCompare()" title="对比 (C)" id="compare-btn">⚡ 对比</button>
+          <button onclick="nextNode()" id="next-node-btn" disabled title="下一节点 (→/空格)">下一节点 ▶</button>
+        </div>
+      </div>
+      
+      <!-- Delta Flash -->
+      <div id="delta-flash" style="position:absolute;bottom:60px;right:20px;font-size:0.85rem;color:#4CAF50;pointer-events:none"></div>
+    </div>
+    
+    <!-- ======== Right: Stats Panel ======== -->
+    <div class="stats-panel">
+      
+      <!-- Beany name & personality -->
+      <h2>
+        <span style="color:var(--beany-color)" id="stats-title">●</span>
+        <span id="stats-shishen">正印 · 木</span>
+      </h2>
+      <div id="stats-runs" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem">情感依赖型主人</div>
+      
+      <!-- Radar Chart -->
+      <div class="stats-section">
+        <div class="stats-label">五性格雷达</div>
+        <div class="radar-container">
+          <canvas id="radar-canvas"></canvas>
+        </div>
+      </div>
+      
+      <!-- Element Weights -->
+      <div class="stats-section">
+        <div class="stats-label">五行权重</div>
+        <div class="elem-bars" id="elem-bars">加载中…</div>
+      </div>
+      
+      <!-- Character Status -->
+      <div class="stats-section">
+        <div class="stats-label">角色状态</div>
+        <div class="char-status" id="char-status">加载中…</div>
+      </div>
+      
+      <!-- Event Timeline -->
+      <div class="stats-section">
+        <div class="stats-label">事件时间线</div>
+        <div class="event-timeline" id="event-timeline">加载中…</div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ======== Compare Overlay ======== -->
+  <div class="compare-overlay" id="compare-overlay">
+    <button class="compare-close" onclick="toggleCompare()">✕</button>
+    <div class="compare-panels">
+      <div class="compare-panel" id="compare-panel-a">
+        <h3>加载对比数据…</h3>
+      </div>
+      <div class="compare-panel" id="compare-panel-b">
+        <h3>加载对比数据…</h3>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ======== Summary Modal ======== -->
+  <div class="summary-modal" id="summary-modal">
+    <div class="summary-card" id="summary-card-content">
+      <h2>节点总结</h2>
+      <button onclick="closeSummary()">关闭</button>
+    </div>
+  </div>
+  
+  <!-- Scripts (load in order) -->
+  <script src="js/all.js"></script>
+  
+  <script>
+    // Boot — read runs from URL params
+    function getUrlParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+    
+    const stored = getUrlParam('runs');
+    if (!stored) {
+      document.getElementById('story-area').innerHTML = 
+        '<div style="text-align:center;padding:2rem;color:var(--text-muted)">⚠️ 未选择运行数据，<a href="index.html" style="color:var(--beany-color)">返回首页</a></div>';
+    } else {
+      try {
+        const runIds = JSON.parse(decodeURIComponent(stored));
+        initGame(runIds);
+      } catch(e) {
+        document.getElementById('story-area').innerHTML = '<div style="padding:2rem;color:#FF5722">⚠️ 脚本错误: '+e.message+'<br><pre style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem">'+e.stack+'</pre></div>';
+      }
+    }
+  </script>
+</body>
+</html>
