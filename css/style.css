@@ -720,3 +720,31 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Stats panel scrollable area + fixed footer */
+.stats-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.stats-footer {
+  text-align: center;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.stats-footer a {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+
+.stats-footer a:hover {
+  color: var(--text-primary);
+}
