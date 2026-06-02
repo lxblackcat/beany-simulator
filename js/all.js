@@ -541,7 +541,7 @@ let state = {
 };
 
 // AXIS_KEYS is already defined in radar.js — only use AXIS_CN here
-const AXIS_CN   = {attachment:'依恋',trust:'信任',stability:'稳定',energy:'能量',curiosity:'好奇'};
+const AGE_MAP={childhood:'幼年',youth:'青年',stable:'稳定','中年':'中年','稳定':'稳定','':'—'};const AXIS_CN   = {attachment:'依恋',trust:'信任',stability:'稳定',energy:'能量',curiosity:'好奇'};
 
 function computePrevFiveAxis(n) {
   if (!n||!n.fiveAxis||!n.personalityDelta) return null;
@@ -613,7 +613,7 @@ function resetNodeState() {
 function renderScene() {
   const n=getCurrentNode();const r=getCurrentRun();
   if(!n||!r)return;const h=document.getElementById('scene-header');if(!h)return;
-  h.innerHTML=`<div class="scene-day">Day ${n.day} · ${n.session===1?'下班后':'睡前'} · <span style="color:${r.color}">${r.dominantElementCn} · ${r.shishen} · ${r.ageStageLabel}</span></div>
+  h.innerHTML=`<div class="scene-day">Day ${n.day} · ${n.session===1?'下班后':'睡前'} · <span style="color:${r.color}">${r.dominantElementCn} · ${r.shishen} · ${AGE_MAP[n.ageStage]||r.ageStageLabel}</span></div>
     <div class="scene-dm">🎬 ${n.environment||''}</div>
     <div style="margin-top:0.3rem;font-size:0.75rem;color:var(--text-muted)">🏷 ${n.eventType||'—'} · ${n.rounds.length} 轮互动</div>`;
 }
@@ -740,7 +740,7 @@ function renderStats(){
   document.getElementById('char-status').innerHTML=`
     <div class="status-item"><div class="status-val" style="color:${r.color}">${r.dominantElementCn}</div><div class="status-label">主导五行</div></div>
     <div class="status-item"><div class="status-val">${r.shishen}</div><div class="status-label">十神</div></div>
-    <div class="status-item"><div class="status-val">${r.ageStageLabel}</div><div class="status-label">年龄</div></div>
+    <div class="status-item"><div class="status-val">${AGE_MAP[n.ageStage]||'—'}</div><div class="status-label">年龄</div></div>
     <div class="status-item"><div class="status-val">Day ${n.day}</div><div class="status-label">当前天数</div></div>`;
   document.getElementById('stats-title').style.color=r.color;
   document.getElementById('stats-shishen').textContent=`${r.shishen} · ${r.dominantElementCn}`;

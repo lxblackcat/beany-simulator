@@ -219,7 +219,7 @@ function readRun(runId) {
       personalityDelta: nodeJson.personality_delta || {},
       fiveAxis: nodeJson['5_axis'] || {},
       entryConditions: nodeJson.entry_conditions || {},
-      importanceScore: nodeJson.importance_score || 0,
+      ageStage: nodeJson.age_stage || personaState.age_stage || '',
       rounds,
     };
   }

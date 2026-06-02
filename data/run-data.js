@@ -59,7 +59,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "max_trigger_per_run": 1
         },
-        "importanceScore": 0.8,
+        "ageStage": "childhood",
         "rounds": [
           {
             "round": 1,
@@ -156,7 +156,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.8,
+        "ageStage": "childhood",
         "rounds": [
           {
             "round": 1,
@@ -242,7 +242,7 @@ const RUN_DATA = {
           "battery_threshold": 30,
           "emotion_required": null
         },
-        "importanceScore": 0.8,
+        "ageStage": "childhood",
         "rounds": [
           {
             "round": 1,
@@ -366,7 +366,7 @@ const RUN_DATA = {
           "min_attachment": 0.35,
           "max_trigger_per_run": 2
         },
-        "importanceScore": 0.8,
+        "ageStage": "childhood",
         "rounds": [
           {
             "round": 1,
@@ -450,7 +450,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.8,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -535,7 +535,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.8,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -581,7 +581,7 @@ const RUN_DATA = {
           "min_attachment": 0.35,
           "max_trigger_per_run": 2
         },
-        "importanceScore": 0.7,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -718,7 +718,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.7,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -803,7 +803,7 @@ const RUN_DATA = {
           "min_attachment": 0.15,
           "emotion_required": null
         },
-        "importanceScore": 0.7,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -940,7 +940,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.6,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -1037,7 +1037,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.7,
+        "ageStage": "中年",
         "rounds": [
           {
             "round": 1,
@@ -1174,7 +1174,7 @@ const RUN_DATA = {
           "min_attachment": 0.15,
           "emotion_required": null
         },
-        "importanceScore": 0.6,
+        "ageStage": "中年",
         "rounds": [
           {
             "round": 1,
@@ -1271,7 +1271,7 @@ const RUN_DATA = {
           "min_trust": 0.1,
           "min_attachment": 0.1
         },
-        "importanceScore": 0.7,
+        "ageStage": "稳定",
         "rounds": [
           {
             "round": 1,
@@ -1381,7 +1381,7 @@ const RUN_DATA = {
           "min_trust": 0.1,
           "min_attachment": 0.1
         },
-        "importanceScore": 0.7,
+        "ageStage": "稳定",
         "rounds": [
           {
             "round": 1,
@@ -1492,7 +1492,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.6,
+        "ageStage": "稳定",
         "rounds": [
           {
             "round": 1,
@@ -1581,7 +1581,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "max_trigger_per_run": 1
         },
-        "importanceScore": 0.8,
+        "ageStage": "childhood",
         "rounds": [
           {
             "round": 1,
@@ -1718,7 +1718,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.7,
+        "ageStage": "childhood",
         "rounds": []
       },
       "day2_N1": {
@@ -1749,7 +1749,7 @@ const RUN_DATA = {
           "min_trust": 0.1,
           "min_attachment": 0.1
         },
-        "importanceScore": 0.7,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -1885,7 +1885,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.5,
+        "ageStage": "youth",
         "rounds": []
       },
       "day3_N1": {
@@ -1916,7 +1916,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.8,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -1961,7 +1961,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.8,
+        "ageStage": "youth",
         "rounds": [
           {
             "round": 1,
@@ -2007,7 +2007,7 @@ const RUN_DATA = {
           "min_attachment": 0.15,
           "emotion_required": null
         },
-        "importanceScore": 0.8,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
@@ -2144,7 +2144,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.8,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
@@ -2189,7 +2189,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.8,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
@@ -2235,7 +2235,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.5,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
@@ -2280,7 +2280,7 @@ const RUN_DATA = {
           "min_trust": 0,
           "min_attachment": 0
         },
-        "importanceScore": 0.7,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
@@ -2326,7 +2326,7 @@ const RUN_DATA = {
           "min_attachment": 0,
           "emotion_required": null
         },
-        "importanceScore": 0.7,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
@@ -2373,7 +2373,7 @@ const RUN_DATA = {
           "battery_threshold": 30,
           "emotion_required": null
         },
-        "importanceScore": 0.8,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
@@ -2484,7 +2484,7 @@ const RUN_DATA = {
           "min_attachment": 0.15,
           "emotion_required": null
         },
-        "importanceScore": 0.8,
+        "ageStage": "stable",
         "rounds": [
           {
             "round": 1,
