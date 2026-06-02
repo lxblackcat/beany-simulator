@@ -3,9 +3,11 @@
  * Smooth animation between value states
  */
 
-const AXIS_LABELS = ['依恋', '信任', '稳定', '能量', '好奇'];
+// 5-axis → 五行映射：依恋→水, 信任→土, 稳定→木, 能量→火, 好奇→金
+const AXIS_LABELS = ['依恋 💧', '信任 🪨', '稳定 🌳', '能量 🔥', '好奇 ✨'];
 const AXIS_KEYS = ['attachment', 'trust', 'stability', 'energy', 'curiosity'];
-const AXIS_COLORS = ['#2196F3', '#FFC107', '#4CAF50', '#FF5722', '#9C27B0'];
+// 颜色统一为五行色：水蓝 土棕 木绿 火橙 金黄
+const AXIS_COLORS = ['#2196F3', '#8D6E63', '#4CAF50', '#FF5722', '#FFC107'];
 
 let currentFiveAxis = { attachment: 0.2, trust: 0.2, stability: 0.2, energy: 0.2, curiosity: 0.2 };
 let targetFiveAxis = { ...currentFiveAxis };

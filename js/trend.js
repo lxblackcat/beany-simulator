@@ -91,10 +91,19 @@ function drawTrend(canvas, data, elemColors) {
     ctx.fillText(elemLabels[e], legendX, legendY + e * 9);
   }
 
-  // X-axis: first and last node labels
+  // X-axis: label every data point with day number
   ctx.fillStyle = 'rgba(255,255,255,0.2)';
   ctx.font = '6px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('D1', pad.left, h - 2);
-  ctx.fillText('D' + (data.length), w - pad.right, h - 2);
+  for (let i = 0; i < count; i++) {
+    // Show label for first, last, and every other point
+    if (i === 0 || i === count - 1) {
+      const x = pad.left + i * xStep;
+      ctx.fillText('D' + (i + 1), x, h - 2);
+    } else if (i % 2 === 0 && count <= 7) {
+      // For <=7 days, label every other middle point
+      const x = pad.left + i * xStep;
+      ctx.fillText('D' + (i + 1), x, h - 2);
+    }
+  }
 }

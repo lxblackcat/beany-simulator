@@ -31,6 +31,49 @@ const ELEM_CN = {
   wood: '木', fire: '火', earth: '土', metal: '金', water: '水',
 };
 
+// 5-axis key → element mapping (自有体系)
+const AXIS_TO_ELEM = {
+  attachment: 'water',   // 水=依恋
+  trust: 'earth',        // 土=信任
+  stability: 'wood',     // 木=稳定
+  energy: 'fire',        // 火=能量
+  curiosity: 'metal',    // 金=好奇
+};
+
+/**
+ * Calculate dominant element from 5-axis values
+ * Finds the axis with highest value and maps to element
+ */
+function deriveDominantFromFiveAxis(fiveAxis) {
+  if (!fiveAxis) return null;
+  let maxVal = -Infinity;
+  let maxAxis = null;
+  for (const [axis, val] of Object.entries(fiveAxis)) {
+    if (val > maxVal) {
+      maxVal = val;
+      maxAxis = axis;
+    }
+  }
+  return maxAxis ? (AXIS_TO_ELEM[maxAxis] || null) : null;
+}
+
+/**
+ * Calculate dominant element from weights
+ * Simply picks the element with highest weight
+ */
+function deriveDominantFromWeights(weights) {
+  if (!weights || Object.keys(weights).length === 0) return null;
+  let maxVal = -Infinity;
+  let maxElem = null;
+  for (const [elem, val] of Object.entries(weights)) {
+    if (val > maxVal) {
+      maxVal = val;
+      maxElem = elem;
+    }
+  }
+  return maxElem;
+}
+
 // Age stage → display
 const AGE_LABELS = {
   childhood: '幼年', youth: '青年', middle: '中年', stable: '稳定期',
@@ -95,7 +138,11 @@ function readRun(runId) {
 
   // Extract shishen and dominant from persona state
   const shishen = personaState.shishen || config['十神'] || (runId.includes('zhengyin') ? '正印' : '食神');
-  const dominantElement = personaState.dominant_element || 'wood';
+  // Calculate dominant from weights, fallback to 5-axis, then file value
+  const dominantElement = deriveDominantFromWeights(personaState.weights) 
+    || deriveDominantFromFiveAxis(personaState['5_axis']) 
+    || personaState.dominant_element 
+    || 'wood';
   const ageStage = personaState.age_stage || 'childhood';
 
   const runData = {
@@ -210,6 +257,13 @@ function readRun(runId) {
       }
     }
 
+    const nodeFiveAxis = nodeJson['5_axis'] || {};
+    // Calculate dominant element from 5-axis; fallback to node.json's value if 5-axis empty
+    const nodeDominant = deriveDominantFromFiveAxis(nodeFiveAxis) 
+      || nodeJson.dominant_element 
+      || personaState.dominant_element 
+      || '';
+
     runData.nodes[nodeId] = {
       day: nodeJson.day || 1,
       session: nodeJson.session || 1,
@@ -217,10 +271,10 @@ function readRun(runId) {
       environment: nodeJson.environment || worldState || '',
       appUi: nodeJson.app_ui || {},
       personalityDelta: nodeJson.personality_delta || {},
-      fiveAxis: nodeJson['5_axis'] || {},
+      fiveAxis: nodeFiveAxis,
       entryConditions: nodeJson.entry_conditions || {},
       ageStage: nodeJson.age_stage || personaState.age_stage || '',
-      dominantElement: nodeJson.dominant_element || personaState.dominant_element || '',
+      dominantElement: nodeDominant,
       rounds,
     };
   }

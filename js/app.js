@@ -18,9 +18,51 @@ let state = {
 
 // AXIS_KEYS is already defined in radar.js — only use AXIS_CN here
 
-function getNodeColor(n,r){if(n&&n.dominantElement&&ELEM_COLORS[n.dominantElement])return ELEM_COLORS[n.dominantElement];return r?r.color:'#888';}
-function getNodeDominantCn(n,r){if(n&&n.dominantElement&&ELEM_CN[n.dominantElement])return ELEM_CN[n.dominantElement];return r?r.dominantElementCn:'—';}
-function drawTrendChart(){const canvas=document.getElementById('trend-canvas');if(!canvas)return;const ids=state.nodeIds;if(!ids||ids.length<2)return;const run=RUN_DATA[state.runId];if(!run)return;const data=[];for(const id of ids){const nd=run.nodes[id];if(!nd||!nd.fiveAxis)continue;const w=deriveElemWeights(nd.fiveAxis);if(w)data.push(w);}if(data.length>=2)drawTrend(canvas,data,ELEM_COLORS);}
+// 5-axis → element mapping (must match build-data.mjs)
+const CLIENT_AXIS_TO_ELEM = {
+  attachment: 'water',
+  trust: 'earth',
+  stability: 'wood',
+  energy: 'fire',
+  curiosity: 'metal',
+};
+
+// Derive dominant element from 5-axis values as fallback
+function deriveDominantFromFiveAxis(fiveAxis) {
+  if (!fiveAxis) return null;
+  let maxVal = -Infinity;
+  let maxAxis = null;
+  for (const [axis, val] of Object.entries(fiveAxis)) {
+    if (val > maxVal) { maxVal = val; maxAxis = axis; }
+  }
+  return maxAxis ? (CLIENT_AXIS_TO_ELEM[maxAxis] || null) : null;
+}
+
+function getDominantElement(n, r) {
+  // Priority: 5-axis derived > data dominantElement > run dominantElement
+  const fromAxis = n && n.fiveAxis ? deriveDominantFromFiveAxis(n.fiveAxis) : null;
+  if (fromAxis) return fromAxis;
+  if (n && n.dominantElement && ELEM_CN[n.dominantElement]) return n.dominantElement;
+  return r ? r.dominantElement : null;
+}
+
+function getNodeColor(n,r) {
+  const elem = getDominantElement(n, r);
+  if (elem && ELEM_COLORS[elem]) return ELEM_COLORS[elem];
+  if (r) return r.color;
+  return '#888';
+}
+
+function getNodeDominantCn(n,r) {
+  const elem = getDominantElement(n, r);
+  if (elem && ELEM_CN[elem]) return ELEM_CN[elem];
+  if (r) return r.dominantElementCn;
+  return '—';
+}
+function drawTrendChart(){const canvas=document.getElementById('trend-canvas');if(!canvas)return;const ids=state.nodeIds;if(!ids||ids.length<2)return;const run=RUN_DATA[state.runId];if(!run)return;
+  // Aggregate by day: use the LAST node per day (latest state)
+  const byDay={};for(const id of ids){const nd=run.nodes[id];if(!nd||!nd.fiveAxis)continue;const m=id.match(/day(\d+)/);if(!m)continue;const day=m[1];const w=deriveElemWeights(nd.fiveAxis);if(w)byDay[day]=w;}const days=Object.keys(byDay).sort((a,b)=>+a-+b);const data=days.map(d=>byDay[d]);
+if(data.length>=2)drawTrend(canvas,data,ELEM_COLORS);}
 
 const AGE_MAP={childhood:'幼年',youth:'青年',stable:'稳定','中年':'中年','稳定':'稳定','':'—'};const AXIS_CN   = {attachment:'依恋',trust:'信任',stability:'稳定',energy:'能量',curiosity:'好奇'};
 
