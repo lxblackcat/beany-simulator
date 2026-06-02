@@ -220,6 +220,7 @@ function readRun(runId) {
       fiveAxis: nodeJson['5_axis'] || {},
       entryConditions: nodeJson.entry_conditions || {},
       ageStage: nodeJson.age_stage || personaState.age_stage || '',
+      dominantElement: nodeJson.dominant_element || personaState.dominant_element || '',
       rounds,
     };
   }

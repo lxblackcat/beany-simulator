@@ -541,6 +541,10 @@ let state = {
 };
 
 // AXIS_KEYS is already defined in radar.js — only use AXIS_CN here
+
+function getNodeColor(n,r){if(n&&n.dominantElement&&ELEM_COLORS[n.dominantElement])return ELEM_COLORS[n.dominantElement];return r?r.color:'#888';}
+function getNodeDominantCn(n,r){if(n&&n.dominantElement&&ELEM_CN[n.dominantElement])return ELEM_CN[n.dominantElement];return r?r.dominantElementCn:'—';}
+
 const AGE_MAP={childhood:'幼年',youth:'青年',stable:'稳定','中年':'中年','稳定':'稳定','':'—'};const AXIS_CN   = {attachment:'依恋',trust:'信任',stability:'稳定',energy:'能量',curiosity:'好奇'};
 
 function computePrevFiveAxis(n) {
@@ -613,7 +617,7 @@ function resetNodeState() {
 function renderScene() {
   const n=getCurrentNode();const r=getCurrentRun();
   if(!n||!r)return;const h=document.getElementById('scene-header');if(!h)return;
-  h.innerHTML=`<div class="scene-day">Day ${n.day} · ${n.session===1?'下班后':'睡前'} · <span style="color:${r.color}">${r.dominantElementCn} · ${r.shishen} · ${AGE_MAP[n.ageStage]||r.ageStageLabel}</span></div>
+  h.innerHTML=`<div class="scene-day">Day ${n.day} · ${n.session===1?'下班后':'睡前'} · <span style="color:${getNodeColor(n,r)}">${getNodeDominantCn(n,r)} · ${r.shishen} · ${AGE_MAP[n.ageStage]||r.ageStageLabel}</span></div>
     <div class="scene-dm">🎬 ${n.environment||''}</div>
     <div style="margin-top:0.3rem;font-size:0.75rem;color:var(--text-muted)">🏷 ${n.eventType||'—'} · ${n.rounds.length} 轮互动</div>`;
 }
@@ -738,12 +742,12 @@ function renderStats(){
     }).join('');
   }
   document.getElementById('char-status').innerHTML=`
-    <div class="status-item"><div class="status-val" style="color:${r.color}">${r.dominantElementCn}</div><div class="status-label">主导五行</div></div>
+    <div class="status-item"><div class="status-val" style="color:${getNodeColor(n,r)}">${getNodeDominantCn(n,r)}</div><div class="status-label">主导五行</div></div>
     <div class="status-item"><div class="status-val">${r.shishen}</div><div class="status-label">十神</div></div>
     <div class="status-item"><div class="status-val">${AGE_MAP[n.ageStage]||'—'}</div><div class="status-label">年龄</div></div>
     <div class="status-item"><div class="status-val">Day ${n.day}</div><div class="status-label">当前天数</div></div>`;
-  document.getElementById('stats-title').style.color=r.color;
-  document.getElementById('stats-shishen').textContent=`${r.shishen} · ${r.dominantElementCn}`;
+  document.getElementById('stats-title').style.color=getNodeColor(n,r);
+  document.getElementById('stats-shishen').textContent=`${r.shishen} · ${getNodeDominantCn(n,r)}`;
   document.getElementById('stats-runs').innerHTML=`情感依赖型主人 <span style="color:var(--text-muted)">· Day ${n.day}</span>`;
   drawTrendChart();
 }

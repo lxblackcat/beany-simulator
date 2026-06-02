@@ -60,6 +60,7 @@ const RUN_DATA = {
           "max_trigger_per_run": 1
         },
         "ageStage": "childhood",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -157,6 +158,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "childhood",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -243,6 +245,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "childhood",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -367,6 +370,7 @@ const RUN_DATA = {
           "max_trigger_per_run": 2
         },
         "ageStage": "childhood",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -451,6 +455,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "youth",
+        "dominantElement": "earth",
         "rounds": [
           {
             "round": 1,
@@ -536,6 +541,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "youth",
+        "dominantElement": "earth",
         "rounds": [
           {
             "round": 1,
@@ -582,6 +588,7 @@ const RUN_DATA = {
           "max_trigger_per_run": 2
         },
         "ageStage": "youth",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -719,6 +726,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "youth",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -804,6 +812,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "youth",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -941,6 +950,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "youth",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1038,6 +1048,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "中年",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1175,6 +1186,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "中年",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1272,6 +1284,7 @@ const RUN_DATA = {
           "min_attachment": 0.1
         },
         "ageStage": "稳定",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1382,6 +1395,7 @@ const RUN_DATA = {
           "min_attachment": 0.1
         },
         "ageStage": "稳定",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1493,6 +1507,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "稳定",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1582,6 +1597,7 @@ const RUN_DATA = {
           "max_trigger_per_run": 1
         },
         "ageStage": "childhood",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1719,6 +1735,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "childhood",
+        "dominantElement": "wood",
         "rounds": []
       },
       "day2_N1": {
@@ -1750,6 +1767,7 @@ const RUN_DATA = {
           "min_attachment": 0.1
         },
         "ageStage": "youth",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -1886,6 +1904,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "youth",
+        "dominantElement": "wood",
         "rounds": []
       },
       "day3_N1": {
@@ -1917,6 +1936,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "youth",
+        "dominantElement": "metal",
         "rounds": [
           {
             "round": 1,
@@ -1962,6 +1982,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "youth",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2008,6 +2029,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2145,6 +2167,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2190,6 +2213,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2236,6 +2260,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2281,6 +2306,7 @@ const RUN_DATA = {
           "min_attachment": 0
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2327,6 +2353,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2374,6 +2401,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
@@ -2485,6 +2513,7 @@ const RUN_DATA = {
           "emotion_required": null
         },
         "ageStage": "stable",
+        "dominantElement": "wood",
         "rounds": [
           {
             "round": 1,
