@@ -1544,11 +1544,11 @@ const RUN_DATA = {
     "personaName": "林小姐",
     "personaLabel": "情感依赖型主人",
     "shishen": "食神",
-    "dominantElement": "wood",
-    "dominantElementCn": "木",
+    "dominantElement": "metal",
+    "dominantElementCn": "金",
     "ageStage": "stable",
     "ageStageLabel": "稳定期",
-    "color": "#4CAF50",
+    "color": "#FFC107",
     "finalStats": {
       "weights": {
         "wood": 0.333,

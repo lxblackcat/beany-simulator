@@ -162,13 +162,8 @@ function readRun(runId) {
   if (!fs.existsSync(nodesDir)) { console.warn(`  ⚠️  No nodes/ dir in ${runId}`); return null; }
   const nodeDirs = fs.readdirSync(nodesDir).filter(d => d.startsWith('day')).sort();
 
-  // Extract shishen and dominant from persona state
+  // Extract shishen
   const shishen = personaState.shishen || config['十神'] || (runId.includes('zhengyin') ? '正印' : '食神');
-  // Calculate dominant from weights, fallback to 5-axis, then file value
-  const dominantElement = deriveDominantFromWeights(personaState.weights) 
-    || deriveDominantFromFiveAxis(personaState['5_axis']) 
-    || personaState.dominant_element 
-    || 'wood';
   const ageStage = personaState.age_stage || 'childhood';
 
   const runData = {
@@ -176,11 +171,11 @@ function readRun(runId) {
     personaName,
     personaLabel: '情感依赖型主人',
     shishen,
-    dominantElement,
-    dominantElementCn: ELEM_CN[dominantElement] || dominantElement,
+    dominantElement: 'wood', // recalculated after nodes processed
+    dominantElementCn: '木',
     ageStage,
     ageStageLabel: AGE_LABELS[ageStage] || ageStage,
-    color: ELEM_COLORS[dominantElement] || '#888',
+    color: '#4CAF50',
     finalStats: {
       weights: personaState.weights || {},
       fiveAxis: personaState['5_axis'] || {},
@@ -303,6 +298,29 @@ function readRun(runId) {
       dominantElement: nodeDominant,
       rounds,
     };
+  }
+
+  // Recalculate run-level dominant from the LAST node's 5-axis
+  // (persona_state values may not match the final node)
+  const nodeIds = Object.keys(runData.nodes).sort();
+  if (nodeIds.length > 0) {
+    const lastNodeId = nodeIds[nodeIds.length - 1];
+    const lastNode = runData.nodes[lastNodeId];
+    const nodeDominant = deriveDominantFromFiveAxis(lastNode.fiveAxis);
+    if (nodeDominant) {
+      runData.dominantElement = nodeDominant;
+      runData.dominantElementCn = ELEM_CN[nodeDominant] || nodeDominant;
+      runData.color = ELEM_COLORS[nodeDominant] || '#888';
+    }
+  } else {
+    // Fallback: persona_state 5-axis
+    const psDominant = deriveDominantFromFiveAxis(runData.finalStats.fiveAxis)
+      || deriveDominantFromWeights(runData.finalStats.weights);
+    if (psDominant) {
+      runData.dominantElement = psDominant;
+      runData.dominantElementCn = ELEM_CN[psDominant] || psDominant;
+      runData.color = ELEM_COLORS[psDominant] || '#888';
+    }
   }
 
   return runData;
