@@ -672,7 +672,13 @@ function resetNodeState() {
 function renderScene() {
   const n=getCurrentNode();const r=getCurrentRun();
   if(!n||!r)return;const h=document.getElementById('scene-header');if(!h)return;
-  h.innerHTML=`<div class="scene-day">Day ${n.day} · ${n.session===1?'下班后':'睡前'} · <span style="color:${getNodeColor(n,r)}">${getNodeDominantCn(n,r)} · ${r.shishen} · ${AGE_MAP[n.ageStage]||r.ageStageLabel}</span></div>
+  // Calculate position within current day
+  const day=parseInt(n.day,10);
+  const dayNodes=state.nodeIds.filter(id=>id.startsWith('day'+day+'_'));
+  const idxInDay=dayNodes.indexOf(state.currentNodeId);
+  const sessionLabel=n.session===1?'下班后':'睡前';
+  const dayProgress=dayNodes.length>1?`〈${idxInDay+1}/${dayNodes.length}〉`:'';
+  h.innerHTML=`<div class="scene-day">Day ${n.day} ${dayProgress}${sessionLabel} · <span style="color:${getNodeColor(n,r)}">${getNodeDominantCn(n,r)} · ${r.shishen} · ${AGE_MAP[n.ageStage]||r.ageStageLabel}</span></div>
     <div class="scene-dm">🎬 ${n.environment||''}</div>
     <div style="margin-top:0.3rem;font-size:0.75rem;color:var(--text-muted)">🏷 ${n.eventType||'—'} · ${n.rounds.length} 轮互动</div>`;
 }
@@ -709,12 +715,17 @@ function renderPairs() {
   }
 
   if(state.nodeComplete){
+    const day=parseInt(n.day,10);
+    const dayNodes=state.nodeIds.filter(id=>id.startsWith('day'+day+'_'));
+    const idxInDay=dayNodes.indexOf(state.currentNodeId);
+    const nextHint=idxInDay < dayNodes.length-1 ? `本日还有 1 个场景` : `Day ${day} 已完成，准备进入 Day ${day+1}`;
     html+=`<div style="text-align:center;padding:1rem;color:var(--text-secondary)">
-      <div style="margin-bottom:0.5rem;font-size:0.9rem">✨ 所有互动已探索</div>
+      <div style="margin-bottom:0.3rem;font-size:0.9rem">✨ 所有互动已探索</div>
+      <div style="margin-bottom:0.5rem;font-size:0.7rem;color:var(--text-muted)">💡 ${nextHint}</div>
       <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap">
         <button onclick="replayNode()" style="background:transparent;border:1px solid var(--border-color);color:var(--text-secondary);padding:0.4rem 1rem;border-radius:8px;cursor:pointer;font-size:0.8rem">🔄 重玩节点</button>
         <button onclick="showNodeSummary()" style="background:${rn.color};border:none;color:white;padding:0.4rem 1.2rem;border-radius:8px;cursor:pointer;font-size:0.8rem">📊 节点总结</button>
-        <button onclick="nextNode()" style="background:transparent;border:1px solid ${rn.color};color:${rn.color};padding:0.4rem 1rem;border-radius:8px;cursor:pointer;font-size:0.8rem">下一节点 ▶</button>
+        <button onclick="nextNode()" style="background:transparent;border:1px solid ${rn.color};color:${rn.color};padding:0.4rem 1rem;border-radius:8px;cursor:pointer;font-size:0.8rem">继续 ▶</button>
       </div></div>`;
   }
 
