@@ -36,8 +36,8 @@ function getRounds() {return getCurrentNode()?.rounds||[];}
 function getPairCount() {return Math.ceil(getRounds().length/2);}
 function getPair(i) {const r=getRounds();return{a:r[i*2]||null,b:r[i*2+1]||null};}
 function shortAction(t) {
-  if(!t)return'互动';const s=t.replace(/[。，、！？\u201c\u201d]/g,' ').trim();
-  return s.length<=30?s:s.substring(0,28)+'…';
+  if(!t)return'互动';
+  return t.replace(/[。，、！？]/g,' ').trim();
 }
 function getDaysIndex() {
   const days={};

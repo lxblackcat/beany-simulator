@@ -94,7 +94,7 @@ function readRun(runId) {
   }
 
   // Extract shishen and dominant from persona state
-  const shishen = personaState.shishen || config['十神'] || runId.includes('zhengyin') ? '正印' : '食神';
+  const shishen = personaState.shishen || config['十神'] || (runId.includes('zhengyin') ? '正印' : '食神');
   const dominantElement = personaState.dominant_element || 'wood';
   const ageStage = personaState.age_stage || 'childhood';
 
@@ -142,7 +142,7 @@ function readRun(runId) {
       let perNodePersona = personaName;
       const personFileInNode = roundFiles.find(f => !f.includes('Beany') && !f.endsWith('.md.bak'));
       if (personFileInNode) {
-        const detected = personFileInNode.replace(/R\d{2}_(.+)\.md$/, '$1');
+        const detected = personFileInNode.replace(/R\d{1,2}_(.+)\.md$/, '$1');
         if (detected && detected.length < 10) perNodePersona = detected;
       }
       
@@ -153,8 +153,11 @@ function readRun(runId) {
         const rNum = i + 1;
         const padNum = String(rNum).padStart(2, '0');
 
-        // Person action
-        const perFile = personFiles.find(f => f.startsWith(`R${padNum}_`));
+        // Person action — try zero-padded first, then non-padded
+        let perFile = personFiles.find(f => f.startsWith(`R${padNum}_`));
+        if (!perFile) {
+          perFile = personFiles.find(f => f.startsWith(`R${rNum}_`));
+        }
         let personAction = { mood: '', reason: '', action: '' };
         if (perFile) {
           const perText = fs.readFileSync(path.join(roundsDir, perFile), 'utf-8');
@@ -180,8 +183,11 @@ function readRun(runId) {
           }
         }
 
-        // Beany reaction
-        const beaFile = beanyFiles.find(f => f.startsWith(`R${padNum}_`));
+        // Beany reaction — try zero-padded first, then non-padded
+        let beaFile = beanyFiles.find(f => f.startsWith(`R${padNum}_`));
+        if (!beaFile) {
+          beaFile = beanyFiles.find(f => f.startsWith(`R${rNum}_`));
+        }
         let beanyReaction = { mood: '', meaning: '', action: '' };
         if (beaFile) {
           const beaText = fs.readFileSync(path.join(roundsDir, beaFile), 'utf-8');
