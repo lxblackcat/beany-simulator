@@ -221,6 +221,7 @@ function renderStats(){
   document.getElementById('stats-title').style.color=r.color;
   document.getElementById('stats-shishen').textContent=`${r.shishen} · ${r.dominantElementCn}`;
   document.getElementById('stats-runs').innerHTML=`情感依赖型主人 <span style="color:var(--text-muted)">· Day ${n.day}</span>`;
+  drawTrendChart();
 }
 
 function updateControls(){
