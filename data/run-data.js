@@ -1541,7 +1541,7 @@ const RUN_DATA = {
   },
   "run_03_p06_shishen": {
     "runId": "run_03_p06_shishen",
-    "personaName": "阿青",
+    "personaName": "林小姐",
     "personaLabel": "情感依赖型主人",
     "shishen": "食神",
     "dominantElement": "wood",

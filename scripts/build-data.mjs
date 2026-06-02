@@ -97,16 +97,30 @@ function readRun(runId) {
   const psPath = path.join(base, 'persona_state.json');
   const personaState = JSON.parse(fs.readFileSync(psPath, 'utf-8'));
 
-  // Read config.md
+  // Read config.md (supports both YAML-style and **key:** format)
   const cfgPath = path.join(base, 'config.md');
   let config = {};
   if (fs.existsSync(cfgPath)) {
     const cfgText = fs.readFileSync(cfgPath, 'utf-8');
     const lines = cfgText.split('\n');
     lines.forEach(line => {
-      const m = line.match(/^\*\*(.+?):\*\*\s*(.+)/);
+      // Try **key:** **value** format first
+      let m = line.match(/^\*\*(.+?):\*\*\s*(.+)/);
       if (m) config[m[1].trim()] = m[2].trim();
+      // Try YAML key: "value" format
+      m = line.match(/^([a-z_]+):\s*"(.+?)"/);
+      if (m) { config[m[1].trim()] = m[2].trim(); return; }
+      // Try YAML key: value format (simple one-liners, no quotes, no leading spaces)
+      m = line.match(/^([a-z_]+):\s*(\S[^#]+)/);
+      if (m && !m[1].startsWith(' ')) config[m[1].trim()] = m[2].trim();
     });
+  }
+
+  // Fallback: extract persona ID from run_id (e.g. run_02_p06_xxx → persona_06)
+  let personaId = config['persona_id'] || '';
+  if (!personaId) {
+    const pidMatch = runId.match(/p(\d+)/);
+    if (pidMatch) personaId = 'persona_' + pidMatch[1].padStart(2, '0');
   }
 
   // Read scene_log.md
@@ -116,25 +130,37 @@ function readRun(runId) {
     sceneLog = fs.readFileSync(slPath, 'utf-8');
   }
 
-  // Determine persona name from rounds files
-  const nodesDir = path.join(base, 'nodes');
-  if (!fs.existsSync(nodesDir)) { console.warn(`  ⚠️  No nodes/ dir in ${runId}`); return null; }
-
-  const nodeDirs = fs.readdirSync(nodesDir).filter(d => d.startsWith('day')).sort();
-
-  // Determine persona name (林小姐 or 阿青 or whatever)
+  // Read persona preset to get actual name
   let personaName = '主人';
-  for (const nd of nodeDirs) {
-    const rDir = path.join(nodesDir, nd, 'rounds');
-    if (fs.existsSync(rDir)) {
-      const files = fs.readdirSync(rDir);
-      const personFile = files.find(f => !f.includes('Beany'));
-      if (personFile) {
-        personaName = personFile.replace(/R\d{2}_(.+)\.md$/, '$1');
-        break;
+  if (personaId) {
+    // Try beany-sim-v2 presets first, then rf presets
+    const presetPaths = [
+      path.join('/home/blackcat/.openclaw/beany-sim-v2/presets/personas', personaId + '.md'),
+      path.join('/home/blackcat/.openclaw/beany-rf-output/presets/personas', personaId + '.md'),
+    ];
+    for (const pp of presetPaths) {
+      if (fs.existsSync(pp)) {
+        const lines = fs.readFileSync(pp, 'utf-8').split('\n');
+        // Find the heading line (contains — or  #)
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('# Persona') || trimmed.startsWith('#Persona')) {
+            // Match: # Persona XX — 林小姐（…） or — 林小姐
+            const nameMatch = trimmed.match(/—\s*(.+?)(?:（|$)/);
+            if (nameMatch) {
+              personaName = nameMatch[1].trim();
+              break;
+            }
+          }
+        }
+        if (personaName !== '主人') break;
       }
     }
   }
+  
+  const nodesDir = path.join(base, 'nodes');
+  if (!fs.existsSync(nodesDir)) { console.warn(`  ⚠️  No nodes/ dir in ${runId}`); return null; }
+  const nodeDirs = fs.readdirSync(nodesDir).filter(d => d.startsWith('day')).sort();
 
   // Extract shishen and dominant from persona state
   const shishen = personaState.shishen || config['十神'] || (runId.includes('zhengyin') ? '正印' : '食神');
