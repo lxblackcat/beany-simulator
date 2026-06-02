@@ -59,24 +59,7 @@
     }
     
     function selectRun(key) {
-      const compare = document.getElementById('compare-mode').checked;
-      const keys = [key];
-      if (compare) {
-        const others = runKeys.filter(k => k !== key);
-        if (others.length > 0) keys.push(others[0]);
-      }
-      // Pass run IDs via URL params (works with both http:// and file://)
-      window.location.href = 'game.html?runs=' + encodeURIComponent(JSON.stringify(keys));
-    }
-    
-    function updateCompareHint() {
-      const checked = document.getElementById('compare-mode').checked;
-      const hint = document.getElementById('compare-hint');
-      if (checked && runKeys.length >= 2) {
-        hint.textContent = '💡 选了正印，食神会自动加载在 B 选项对比';
-      } else {
-        hint.textContent = runKeys.length >= 2 ? '💡 开启后可以同时体验两个性格线' : '';
-      }
+      window.location.href = 'game.html?runs=' + encodeURIComponent(JSON.stringify([key]));
     }
   </script>
 </body>
