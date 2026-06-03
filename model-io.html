@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐾 Beany Model — Input / Output 数据流</title>
+<title>🐾 Beany Model — 交互式数据流演示</title>
 <style>
 :root {
   --bg: #1a1a2e;
   --card: #16213e;
+  --panel: #0f3460;
   --border: #2a2a4a;
   --text: #e8e8e8;
   --muted: #666680;
@@ -22,446 +23,601 @@ body {
   font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
   background: var(--bg);
   color: var(--text);
-  padding: 2rem;
-}
-h1 { font-size:1.4rem; margin-bottom:0.3rem; }
-h1 small { font-size:0.8rem; color:var(--muted); font-weight:normal; }
-.subtitle { color:var(--muted); font-size:0.85rem; margin-bottom:2rem; }
-
-/* ============== Flow Layout ============== */
-.flow {
-  display: flex;
-  gap: 1.5rem;
-  align-items: stretch;
-}
-.flow-column {
-  flex: 1;
-  min-width: 0;
-}
-.flow-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: var(--muted);
-  flex: 0 0 2rem;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
-/* ============== Section Cards ============== */
-.section {
+/* Header */
+.header {
+  padding:1rem 2rem;
+  border-bottom:1px solid var(--border);
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem 1.2rem;
-  margin-bottom: 1rem;
-}
-.section-title {
-  font-size:0.85rem;
-  font-weight:600;
-  margin-bottom:0.8rem;
   display:flex;
   align-items:center;
-  gap:0.5rem;
+  gap:1rem;
 }
-.section-title .tag {
-  font-size:0.6rem;
-  background: var(--border);
-  color: var(--muted);
-  padding:0.1rem 0.4rem;
-  border-radius:4px;
-}
-.field-row {
-  display:flex;
-  align-items:baseline;
-  gap:0.5rem;
-  padding:0.3rem 0;
-  font-size:0.8rem;
-  border-bottom:1px solid rgba(255,255,255,0.04);
-}
-.field-row:last-child { border-bottom:none; }
-.field-name {
-  color: var(--muted);
-  font-family: 'Courier New',monospace;
-  font-size:0.7rem;
-  min-width:8rem;
-}
-.field-desc { color: var(--text); }
-.field-desc .hl { color:var(--gold); font-weight:600; }
-.field-desc .hl-blue { color:var(--blue); }
-.field-desc .hl-green { color:var(--green); }
-.field-desc .hl-orange { color:var(--orange); }
-.field-desc .hl-brown { color:var(--brown); }
-
-/* ============== Bytes ============== */
-.byte-row {
-  display:flex;
-  gap:3px;
-  margin:0.5rem 0;
-  flex-wrap:wrap;
-}
-.byte {
-  background: rgba(255,255,255,0.06);
-  border:1px solid var(--border);
-  border-radius:4px;
-  padding:0.2rem 0.4rem;
-  font-family:'Courier New',monospace;
-  font-size:0.65rem;
-  text-align:center;
-  min-width:1.8rem;
-}
-.byte .label {
-  display:block;
-  font-size:0.5rem;
+.header h1 { font-size:1.1rem; }
+.header .step-indicator {
+  margin-left:auto;
+  font-size:0.75rem;
   color:var(--muted);
 }
-.byte.highlight { border-color:var(--gold); background:rgba(255,193,7,0.1); }
-.byte.blue { border-color:var(--blue); background:rgba(33,150,243,0.1); }
-.byte.green { border-color:var(--green); background:rgba(76,175,80,0.1); }
+.header .step-indicator span { color:var(--gold); font-weight:600; }
 
-/* ============== Vote / Ratio Bars ============== */
-.ratio-bar {
-  display:flex;
-  align-items:center;
-  gap:0.5rem;
-  padding:0.2rem 0;
-  font-size:0.75rem;
-}
-.ratio-bar .label { width:8rem; color:var(--muted); }
-.ratio-bar .track {
+/* Main area */
+.main {
   flex:1;
-  height:6px;
-  background:rgba(255,255,255,0.06);
-  border-radius:3px;
+  display:flex;
   overflow:hidden;
 }
-.ratio-bar .fill {
-  height:100%;
-  border-radius:3px;
-  transition:width 0.5s;
-}
-.ratio-bar .val { width:2.5rem; text-align:right; font-family:monospace; }
 
-.vote-row {
+/* ============ Pipeline ============ */
+.pipeline {
+  flex:1;
   display:flex;
-  align-items:center;
-  gap:0.5rem;
-  padding:0.25rem 0;
-  font-size:0.75rem;
+  align-items:stretch;
+  padding:2rem;
+  gap:0;
+  overflow-x:auto;
 }
-.vote-elem {
-  width:1.5rem;
-  height:1.5rem;
-  border-radius:50%;
+.pipe-step {
+  flex:1;
+  min-width:260px;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+.pipe-step + .pipe-step::before {
+  content:'▶';
+  position:absolute;
+  left:-0.8rem;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+  font-size:1.2rem;
+  z-index:1;
+}
+.step-header {
+  text-align:center;
+  padding:0.5rem;
+  font-size:0.75rem;
+  font-weight:600;
+  border-bottom:2px solid var(--border);
+  margin-bottom:0.5rem;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:0.7rem;
-  color:#fff;
-  font-weight:600;
+  gap:0.4rem;
 }
-.vote-bar {
-  flex:1;
-  height:8px;
-  background:rgba(255,255,255,0.06);
-  border-radius:4px;
-  overflow:hidden;
-}
-.vote-fill { height:100%; border-radius:4px; transition:width 0.5s; }
-.vote-label { width:6rem; color:var(--muted); font-family:monospace; }
-
-/* ============== Lookup Table ============== */
-.lookup-table {
-  width:100%;
-  border-collapse:collapse;
-  font-size:0.7rem;
-  margin-top:0.5rem;
-}
-.lookup-table th {
-  text-align:left;
+.step-header .direction {
+  font-size:0.6rem;
   color:var(--muted);
-  padding:0.3rem 0.4rem;
-  border-bottom:1px solid var(--border);
-  font-weight:500;
+  font-weight:normal;
+  background:rgba(255,255,255,0.05);
+  padding:0.1rem 0.4rem;
+  border-radius:4px;
 }
-.lookup-table td {
-  padding:0.3rem 0.4rem;
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  font-family:'Courier New',monospace;
+.step-body {
+  flex:1;
+  padding:0.5rem;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background: var(--card);
+  opacity:0.2;
+  transition: opacity 0.4s;
 }
-.lookup-table .event-name { font-family:inherit; color:var(--text); }
+.step-body.active {
+  opacity:1;
+  border-color: var(--gold);
+  box-shadow:0 0 12px rgba(255,193,7,0.1);
+}
+.step-body.done {
+  opacity:0.8;
+  border-color: var(--green);
+}
+.step-body.future {
+  opacity:0.2;
+}
 
-/* ============== Responsive ============== */
-@media (max-width:900px) {
-  .flow { flex-direction:column; }
-  .flow-arrow { transform:rotate(90deg); }
+/* ============ Event cards ============ */
+.event-item {
+  display:flex;
+  align-items:center;
+  gap:0.4rem;
+  padding:0.3rem 0.4rem;
+  font-size:0.7rem;
+  border-bottom:1px solid rgba(255,255,255,0.04);
 }
+.event-item:last-child { border-bottom:none; }
+.event-badge {
+  background: rgba(255,255,255,0.08);
+  border-radius:4px;
+  padding:0.05rem 0.3rem;
+  font-family:monospace;
+  font-size:0.6rem;
+  min-width:2rem;
+  text-align:center;
+}
+.event-count {
+  margin-left:auto;
+  background: var(--gold);
+  color:#000;
+  border-radius:8px;
+  padding:0 0.3rem;
+  font-size:0.6rem;
+  font-weight:600;
+  min-width:1.2rem;
+  text-align:center;
+}
+
+/* ============ Bytes ============ */
+.byte-row {
+  display:flex;
+  gap:2px;
+  flex-wrap:wrap;
+  margin:0.4rem 0;
+}
+.byte {
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:0.15rem 0.3rem;
+  font-family:monospace;
+  font-size:0.6rem;
+  text-align:center;
+}
+.byte .bl { display:block; font-size:0.5rem; color:var(--muted); }
+.byte.hl { border-color:var(--gold); background:rgba(255,193,7,0.12); }
+
+/* ============ Ratio bars ============ */
+.ratio-line {
+  display:flex;
+  align-items:center;
+  gap:0.4rem;
+  padding:0.15rem 0;
+  font-size:0.65rem;
+}
+.ratio-line .rl { width:6rem; color:var(--muted); }
+.ratio-line .rt {
+  flex:1; height:5px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden;
+}
+.ratio-line .rf { height:100%; border-radius:2px; transition:width 0.5s; }
+.ratio-line .rv { width:2.2rem; text-align:right; font-family:monospace; font-size:0.6rem; }
+
+/* ============ Vote ============ */
+.vote-line {
+  display:flex;
+  align-items:center;
+  gap:0.4rem;
+  padding:0.2rem 0;
+  font-size:0.65rem;
+}
+.vote-dot {
+  width:1.2rem; height:1.2rem;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.6rem; color:#fff; font-weight:600;
+}
+.vote-track {
+  flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;
+}
+.vote-fill { height:100%; border-radius:3px; transition:width 0.5s; }
+.vote-num { width:3rem; font-family:monospace; font-size:0.6rem; color:var(--muted); }
+
+/* ============ Axis ============ */
+.axis-line {
+  display:flex; align-items:center; gap:0.3rem; padding:0.15rem 0; font-size:0.65rem;
+}
+.axis-line .al { width:3rem; color:var(--muted); }
+.axis-line .an { font-family:monospace; }
+.axis-line .ad { font-size:0.55rem; color:var(--muted); }
+.axis-line .up { color:var(--green); }
+.axis-line .down { color:var(--orange); }
+
+/* ============ Table ============ */
+.mini-table {
+  width:100%; border-collapse:collapse; font-size:0.6rem; margin-top:0.3rem;
+}
+.mini-table th {
+  text-align:left; color:var(--muted); padding:0.2rem 0.3rem;
+  border-bottom:1px solid var(--border); font-weight:500;
+}
+.mini-table td {
+  padding:0.2rem 0.3rem; border-bottom:1px solid rgba(255,255,255,0.04);
+  font-family:monospace;
+}
+
+/* ============ Controls ============ */
+.controls {
+  padding:1rem 2rem;
+  border-top:1px solid var(--border);
+  background: var(--card);
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+.controls button {
+  background: rgba(255,193,7,0.15);
+  border:1px solid var(--gold);
+  color: var(--gold);
+  padding:0.5rem 1.5rem;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:0.8rem;
+  transition:all 0.2s;
+}
+.controls button:hover { background:rgba(255,193,7,0.25); }
+.controls button:disabled { opacity:0.3; cursor:not-allowed; }
+.controls button.reset {
+  background:transparent;
+  border-color:var(--border);
+  color:var(--muted);
+}
+.controls .status {
+  margin-left:auto;
+  font-size:0.7rem;
+  color:var(--muted);
+}
+
+/* ============ Right info panel ============ */
+.info-panel {
+  width:280px;
+  border-left:1px solid var(--border);
+  padding:1rem;
+  font-size:0.7rem;
+  overflow-y:auto;
+  background: var(--card);
+  display:flex;
+  flex-direction:column;
+  gap:0.6rem;
+}
+.info-panel h3 { font-size:0.75rem; margin-bottom:0.3rem; }
+.info-panel .info-row {
+  display:flex; gap:0.3rem; padding:0.2rem 0;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.info-panel .info-row .il { color:var(--muted); min-width:5rem; }
+.info-panel .info-row .iv { font-family:monospace; }
 </style>
 </head>
 <body>
 
-<h1>🐾 Beany Model — 模型库 Input / Output 接口</h1>
-<p class="subtitle">数据流规范 · 用于硬件团队与模型团队对接 · KMM 封装（AAR / XCFramework）</p>
+<div class="header">
+  <h1>🐾 Beany Model 数据流</h1>
+  <div style="font-size:0.7rem;color:var(--muted)">交互式演示 · 点「模拟一天」逐步查看</div>
+  <div class="step-indicator">步骤 <span id="step-num">0</span> / <span id="step-total">5</span></div>
+</div>
 
-<div class="flow">
-
-<!-- ==================== INPUT ==================== -->
-<div class="flow-column">
-  <div style="text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">⬅ 硬件 → App</div>
-
-  <!-- PetInteractionEventBatch -->
-  <div class="section">
-    <div class="section-title">
-      📦 PetInteractionEventBatch
-      <span class="tag">设备→App</span>
+<div class="main">
+  <!-- ============ Pipeline ============ -->
+  <div class="pipeline" id="pipeline">
+    <!-- Step 1: Events -->
+    <div class="pipe-step">
+      <div class="step-header">📦 硬件事件上报 <span class="direction">设备→App</span></div>
+      <div class="step-body" id="step-1">
+        <div id="events-content">
+          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待模拟一天…</div>
+        </div>
+      </div>
     </div>
-    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:0.5rem">一天的交互事件，设备合并后上报</div>
+
+    <!-- Step 2: Ratios -->
+    <div class="pipe-step">
+      <div class="step-header">📊 计算 8 比例 <span class="direction">模型内部</span></div>
+      <div class="step-body future" id="step-2">
+        <div id="ratios-content">
+          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Vote -->
+    <div class="pipe-step">
+      <div class="step-header">🗳️ 五行投票+调整 <span class="direction">模型内部</span></div>
+      <div class="step-body future" id="step-3">
+        <div id="vote-content">
+          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: 5-axis -->
+    <div class="pipe-step">
+      <div class="step-header">📈 5-axis 更新 <span class="direction">模型内部</span></div>
+      <div class="step-body future" id="step-4">
+        <div id="axis-content">
+          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Output -->
+    <div class="pipe-step">
+      <div class="step-header">📋 新快照+查表 <span class="direction">App→设备</span></div>
+      <div class="step-body future" id="step-5">
+        <div id="output-content">
+          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Right Panel ============ -->
+  <div class="info-panel">
+    <h3>📖 快照 (PetGrowthSnapshot)</h3>
+    <div id="snapshot-info">
+      <div style="color:var(--muted)">等待开始…</div>
+    </div>
+    <h3>ℹ️ 当前步骤说明</h3>
+    <div id="step-desc" style="color:var(--muted);font-size:0.65rem;line-height:1.5">
+      点击下方「模拟一天」开始演示数据流
+    </div>
+  </div>
+</div>
+
+<!-- ============ Controls ============ -->
+<div class="controls">
+  <button class="reset" onclick="resetFlow()">⟲ 重置</button>
+  <button id="btn-next" onclick="nextStep()">▶ 模拟一天</button>
+  <div class="status" id="status-text">就绪</div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const SAMPLE = {
+  events: [
+    { id:1, name:'摸头顶', count:3, emotion:'开心', time:'18:22', loc:'headtop' },
+    { id:10, name:'摸肚子', count:1, emotion:'平静', time:'18:30', loc:'belly' },
+    { id:1, name:'摸头顶', count:2, emotion:'开心', time:'19:05', loc:'headtop' },
+    { id:28, name:'被拿起', count:1, emotion:'平静', time:'19:10', loc:'motion' },
+    { id:34, name:'平静语调', count:2, emotion:'平静', time:'19:11', loc:'voice' },
+    { id:15, name:'摸侧面', count:1, emotion:'开心', time:'19:20', loc:'side' },
+    { id:33, name:'被放下', count:1, emotion:'平静', time:'19:22', loc:'motion' },
+  ],
+  oldSnapshot: {
+    schema:'0xEA', metal:100, wood:80, water:90, fire:70, earth:60,
+    stage:'幼年', stageVal:0x02, growValue:50, revision:5, milestone:'0x0000'
+  },
+  ratios: {
+    contact_duration: 0.71, contact_frequency: 0.65, force: 0.25,
+    force_variance: 0.22, gesture_diversity: 0.35, vocal_engagement: 0.60,
+    novelty_seeking: 0.15, response_timing: 0.55
+  },
+  votes: { 金:3, 木:5, 水:2, 火:4, 土:3 },
+  oldWeights: { 金:22, 木:28, 水:15, 火:20, 土:15 },
+  newWeights: { 金:24, 木:28, 水:13, 火:19, 土:16 },
+  elementChanges: { wood:0.04, fire:0.01, earth:-0.02, metal:0.02, water:-0.03 },
+  oldAxis: { attachment:0.205, trust:0.177, stability:0.304, energy:0.284, curiosity:0.332 },
+  axisDelta: { attachment:0.008, trust:-0.012, stability:0.015, energy:0.006, curiosity:-0.005 },
+  newAxis: { attachment:0.213, trust:0.165, stability:0.319, energy:0.290, curiosity:0.327 },
+  newSnapshot: {
+    metal:110, wood:80, water:75, fire:76, earth:58,
+    stage:'成年', stageVal:0x03, growValue:60, revision:6, milestone:'0x0001'
+  },
+  lookupTable: [
+    { ev:'摸头顶', emo:'ANY', actionId:'0x1E', action:'抬头30°500ms', sound:'0x01', vib:0, w:0.8 },
+    { ev:'摸头顶', emo:'ANY', actionId:'0x05', action:'抬头60°150ms', sound:'0x02', vib:0, w:0.2 },
+    { ev:'摸肚子', emo:'开心', actionId:'0x50', action:'低头30°500ms', sound:'0x13', vib:1, w:0.7 },
+    { ev:'摸肚子', emo:'开心', actionId:'0x55', action:'左转60°300ms', sound:'0x14', vib:1, w:0.3 },
+    { ev:'被拿起', emo:'ANY', actionId:'0x62', action:'抬头90°400ms', sound:'0x1F', vib:0, w:1.0 },
+    { ev:'平静语调', emo:'ANY', actionId:'0x0B', action:'抬头90°500ms', sound:'0x1F', vib:0, w:1.0 },
+  ],
+  story: 'Beany 在窗台上晒了一下午太阳，翻了个身把靠垫蹭歪了一点。傍晚听到走廊脚步声，竖起耳朵听了一会儿——不是主人，又趴回去了。'
+};
+
+const ELEM_COLORS = { 金:'#FFC107', 木:'#4CAF50', 水:'#2196F3', 火:'#FF5722', 土:'#8D6E63' };
+
+let step = 0;
+const TOTAL = 5;
+
+// ===================== RENDER =====================
+function renderEvents() {
+  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">设备一天上报 ${SAMPLE.events.length} 条（已合并）</div>`;
+  SAMPLE.events.forEach(e => {
+    html += `<div class="event-item">
+      <span class="event-badge">0x${e.id.toString(16).padStart(2,'0')}</span>
+      <span>${e.name}</span>
+      <span style="color:var(--muted);font-size:0.6rem">${e.emotion}</span>
+      <span class="event-count">×${e.count}</span>
+    </div>`;
+  });
+  // raw bytes
+  html += `<div style="margin-top:0.3rem;font-size:0.55rem;color:var(--muted)">
+    <div>原始字节（批次头 + 7条 PetInteractionEvent × 9B）:</div>
     <div class="byte-row">
-      <div class="byte highlight">0xEA<span class="label">schema</span></div>
-      <div class="byte">00 07<span class="label">event_count=7</span></div>
+      <div class="byte hl">EA<span class="bl">schema</span></div>
+      <div class="byte hl">00 07<span class="bl">count=7</span></div>
+      <div class="byte">01 67 1F 3B 80 03 01 00 00</div>
+      <div class="byte">0A 67 1F 3B 88 01 02 00 00</div>
     </div>
-    <table style="width:100%;font-size:0.7rem;margin-top:0.3rem;border-collapse:collapse">
-      <tr><th>event_id</th><th>事件</th><th>次数</th><th>情绪</th><th>时间</th></tr>
-      <tr><td>0x01</td><td>Headtouch(摸头顶)</td><td>3</td><td>开心</td><td>18:22</td></tr>
-      <tr><td>0x0A</td><td>Bellytouch(摸肚子)</td><td>1</td><td>平静</td><td>18:30</td></tr>
-      <tr><td>0x01</td><td>Headtouch(摸头顶)</td><td>2</td><td>开心</td><td>19:05</td></tr>
-      <tr><td>0x1C</td><td>Pickedup(被拿起)</td><td>1</td><td>平静</td><td>19:10</td></tr>
-      <tr><td>0x28</td><td>Calmvoice(平静语调)</td><td>2</td><td>平静</td><td>19:11</td></tr>
-      <tr><td>0x15</td><td>Sidetouch—tap(摸侧面)</td><td>1</td><td>开心</td><td>19:20</td></tr>
-      <tr><td>0x1D</td><td>Putdown(被放下)</td><td>1</td><td>平静</td><td>19:22</td></tr>
-    </table>
-  </div>
+  </div>`;
+  document.getElementById('events-content').innerHTML = html;
+}
 
-  <!-- PetGrowthSnapshot (current) -->
-  <div class="section">
-    <div class="section-title">
-      📷 PetGrowthSnapshot（当前）
-      <span class="tag">设备↔App</span>
-    </div>
-    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:0.5rem">11 字节固定 · 上次保存的状态</div>
-    <div class="byte-row">
-      <div class="byte blue">0xEA<span class="label">schema</span></div>
-      <div class="byte" style="background:rgba(255,193,7,0.12);border-color:var(--gold)">64<span class="label">金↑100</span></div>
-      <div class="byte" style="background:rgba(76,175,80,0.12);border-color:var(--green)">50<span class="label">木↓80</span></div>
-      <div class="byte" style="background:rgba(33,150,243,0.12);border-color:var(--blue)">5A<span class="label">水↓90</span></div>
-      <div class="byte" style="background:rgba(255,87,34,0.12);border-color:var(--orange)">46<span class="label">火↓70</span></div>
-      <div class="byte" style="background:rgba(141,110,99,0.12);border-color:var(--brown)">3C<span class="label">土↓60</span></div>
-      <div class="byte green">02<span class="label">stage=幼年</span></div>
-      <div class="byte">32<span class="label">进度=50</span></div>
-      <div class="byte">05<span class="label">revision=5</span></div>
-      <div class="byte">00 00<span class="label">milestone</span></div>
-    </div>
-    <table style="width:100%;font-size:0.7rem;margin-top:0.3rem">
-      <tr><td style="color:var(--muted)">stage: 0x02</td><td>幼年期</td></tr>
-      <tr><td style="color:var(--muted)">stage_grow_value: 50</td><td>阶段内进度 50/255</td></tr>
-      <tr><td style="color:var(--muted)">state_revision: 5</td><td>版本号，单调递增</td></tr>
-    </table>
-  </div>
-</div>
+function renderRatios() {
+  const r = SAMPLE.ratios;
+  const items = [
+    ['contact_duration', r.contact_duration, '#2196F3'],
+    ['contact_frequency', r.contact_frequency, '#2196F3'],
+    ['force', r.force, '#FFC107'],
+    ['force_variance', r.force_variance, '#FFC107'],
+    ['gesture_diversity', r.gesture_diversity, '#FFC107'],
+    ['vocal_engagement', r.vocal_engagement, '#2196F3'],
+    ['novelty_seeking', r.novelty_seeking, '#FFC107'],
+    ['response_timing', r.response_timing, '#2196F3'],
+  ];
+  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">每条比例 vs 0.5 阈值决定投票方向</div>`;
+  items.forEach(([name, val, color]) => {
+    const pct = Math.round(val*100);
+    html += `<div class="ratio-line">
+      <span class="rl">${name}</span>
+      <div class="rt"><div class="rf" style="width:${pct}%;background:${color}"></div></div>
+      <span class="rv" style="color:${val>0.5?'var(--blue)':'var(--gold)'}">${val>0.5?'⬆':'⬇'} ${val.toFixed(2)}</span>
+    </div>`;
+  });
+  document.getElementById('ratios-content').innerHTML = html;
+}
 
-<!-- ==================== ARROW ==================== -->
-<div class="flow-arrow">▶</div>
+function renderVote() {
+  const w = SAMPLE.oldWeights;
+  const maxVotes = Math.max(...Object.values(SAMPLE.votes));
+  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">最高票+5% · 最低票−5% · 相生+1%</div>`;
+  Object.entries(SAMPLE.votes).forEach(([elem, votes]) => {
+    const vpct = (votes / maxVotes) * 100;
+    html += `<div class="vote-line">
+      <div class="vote-dot" style="background:${ELEM_COLORS[elem]}">${elem}</div>
+      <div class="vote-track"><div class="vote-fill" style="width:${vpct}%;background:${ELEM_COLORS[elem]}"></div></div>
+      <span class="vote-num">${votes} 票</span>
+      <span style="font-family:monospace;font-size:0.6rem;min-width:3.5rem">权重 ${w[elem]}%</span>
+    </div>`;
+  });
+  html += `<div style="margin-top:0.3rem;font-size:0.6rem;color:var(--muted)">
+    木最高票(+5%) → 水最低票(−5%) → 木生火(+1%)<br>
+    <span style="color:var(--gold)">新权重: 金24% 木28% 水13% 火19% 土16%</span>
+  </div>`;
+  document.getElementById('vote-content').innerHTML = html;
+}
 
-<!-- ==================== PROCESS ==================== -->
-<div class="flow-column">
-  <div style="text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">模型库内部（KMM）</div>
+function renderAxis() {
+  const oldA = SAMPLE.oldAxis;
+  const newA = SAMPLE.newAxis;
+  const delta = SAMPLE.axisDelta;
+  const axisCN = { attachment:'依恋', trust:'信任', stability:'稳定', energy:'能量', curiosity:'好奇' };
+  const axisColors = { attachment:'#2196F3', trust:'#8D6E63', stability:'#4CAF50', energy:'#FF5722', curiosity:'#FFC107' };
+  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">element_changes_today × 映射矩阵</div>`;
+  Object.keys(axisCN).forEach(key => {
+    const d = delta[key];
+    const cls = d >= 0 ? 'up' : 'down';
+    const sign = d >= 0 ? '+' : '';
+    html += `<div class="axis-line">
+      <span class="al" style="color:${axisColors[key]}">${axisCN[key]}</span>
+      <span class="an ${cls}">${oldA[key].toFixed(3)} ${sign}${d.toFixed(3)} → ${newA[key].toFixed(3)}</span>
+      <span class="ad">(${d>=0?'⬆':'⬇'} ${(Math.abs(d)*1000).toFixed(0)}‰)</span>
+    </div>`;
+  });
+  document.getElementById('axis-content').innerHTML = html;
+}
 
-  <!-- Step 1: 8 比例 -->
-  <div class="section">
-    <div class="section-title">① 计算 8 比例 <span class="tag">RatioCalculator</span></div>
-    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:0.5rem">从事件聚合一天的行为特征</div>
-    <div class="ratio-bar">
-      <span class="label">contact_duration</span>
-      <div class="track"><div class="fill" style="width:71%;background:var(--blue)"></div></div>
-      <span class="val" style="color:var(--blue)">0.71</span>
-    </div>
-    <div class="ratio-bar">
-      <span class="label">contact_frequency</span>
-      <div class="track"><div class="fill" style="width:65%;background:var(--blue)"></div></div>
-      <span class="val" style="color:var(--blue)">0.65</span>
-    </div>
-    <div class="ratio-bar">
-      <span class="label">force</span>
-      <div class="track"><div class="fill" style="width:25%;background:var(--gold)"></div></div>
-      <span class="val" style="color:var(--gold)">0.25</span>
-    </div>
-    <div class="ratio-bar">
-      <span class="label">force_variance</span>
-      <div class="track"><div class="fill" style="width:22%;background:var(--gold)"></div></div>
-      <span class="val" style="color:var(--gold)">0.22</span>
-    </div>
-    <div class="ratio-bar">
-      <span class="label">gesture_diversity</span>
-      <div class="track"><div class="fill" style="width:35%;background:var(--gold)"></div></div>
-      <span class="val" style="color:var(--gold)">0.35</span>
-    </div>
-    <div class="ratio-bar">
-      <span class="label">vocal_engagement</span>
-      <div class="track"><div class="fill" style="width:60%;background:var(--blue)"></div></div>
-      <span class="val" style="color:var(--blue)">0.60</span>
-    </div>
-    <div class="ratio-bar">
-      <span class="label">novelty_seeking</span>
-      <div class="track"><div class="fill" style="width:15%;background:var(--gold)"></div></div>
-      <span class="val" style="color:var(--gold)">0.15</span>
-    </div>
-    <div class="ratio-bar">
-      <span class="label">response_timing</span>
-      <div class="track"><div class="fill" style="width:55%;background:var(--blue)"></div></div>
-      <span class="val" style="color:var(--blue)">0.55</span>
-    </div>
-  </div>
+function renderOutput() {
+  const ns = SAMPLE.newSnapshot;
+  // Snapshot bytes
+  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">PetGrowthSnapshot (11 字节)</div>
+  <div class="byte-row">
+    <div class="byte hl">0xEA<span class="bl">schema</span></div>
+    <div class="byte hl">${ns.metal.toString(16).padStart(2,'0')}<span class="bl">金↑</span></div>
+    <div class="byte hl">${ns.wood.toString(16).padStart(2,'0')}<span class="bl">木→</span></div>
+    <div class="byte hl">${ns.water.toString(16).padStart(2,'0')}<span class="bl">水↓</span></div>
+    <div class="byte hl">${ns.fire.toString(16).padStart(2,'0')}<span class="bl">火↑</span></div>
+    <div class="byte hl">${ns.earth.toString(16).padStart(2,'0')}<span class="bl">土↓</span></div>
+    <div class="byte hl">0x0${ns.stageVal}<span class="bl">${ns.stage}</span></div>
+    <div class="byte hl">${ns.growValue.toString(16).padStart(2,'0')}<span class="bl">进度</span></div>
+    <div class="byte hl">0x0${ns.revision}<span class="bl">rev</span></div>
+    <div class="byte hl">${ns.milestone}<span class="bl">milestone</span></div>
+  </div>`;
 
-  <!-- Step 2: 投票 -->
-  <div class="section">
-    <div class="section-title">② 五行投票 <span class="tag">StrategyEngine</span></div>
-    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:0.5rem">8 比例 vs 0.5 阈值 → 投票 → ±5% 调整 → 相生</div>
-    <div class="vote-row">
-      <div class="vote-elem" style="background:var(--gold)">金</div>
-      <div class="vote-bar"><div class="vote-fill" style="width:42%;background:var(--gold)"></div></div>
-      <span class="vote-label">票: 3 · 权重 22%</span>
-    </div>
-    <div class="vote-row">
-      <div class="vote-elem" style="background:var(--green)">木</div>
-      <div class="vote-bar"><div class="vote-fill" style="width:60%;background:var(--green)"></div></div>
-      <span class="vote-label">票: 5 · 权重 28%</span>
-    </div>
-    <div class="vote-row">
-      <div class="vote-elem" style="background:var(--blue)">水</div>
-      <div class="vote-bar"><div class="vote-fill" style="width:25%;background:var(--blue)"></div></div>
-      <span class="vote-label">票: 2 · 权重 15%</span>
-    </div>
-    <div class="vote-row">
-      <div class="vote-elem" style="background:var(--orange)">火</div>
-      <div class="vote-bar"><div class="vote-fill" style="width:38%;background:var(--orange)"></div></div>
-      <span class="vote-label">票: 4 · 权重 20%</span>
-    </div>
-    <div class="vote-row">
-      <div class="vote-elem" style="background:var(--brown)">土</div>
-      <div class="vote-bar"><div class="vote-fill" style="width:30%;background:var(--brown)"></div></div>
-      <span class="vote-label">票: 3 · 权重 15%</span>
-    </div>
-    <div style="margin-top:0.4rem;font-size:0.65rem;color:var(--muted)">
-      最高票木(+5%) → 相生木生火 → 火+1%<br>
-      最低票水(-5%) → 新权重: 木28% 金24% 火19% 土16% 水13%
-    </div>
-  </div>
+  // Table
+  html += `<div style="margin-top:0.5rem;font-size:0.6rem;color:var(--muted);margin-bottom:0.2rem">PetBehaviorLookupTable (6 行 · revision=3)</div>
+  <table class="mini-table">
+    <tr><th>事件</th><th>情绪</th><th>动作ID</th><th>声音</th><th>震</th><th>权重</th></tr>`;
+  SAMPLE.lookupTable.forEach(row => {
+    html += `<tr><td>${row.ev}</td><td>${row.emo}</td><td>${row.actionId}</td><td>${row.sound}</td><td>${row.vib}</td><td>${row.w.toFixed(1)}</td></tr>`;
+  });
+  html += `</table>`;
 
-  <!-- Step 3: 5-axis + 查表 -->
-  <div class="section">
-    <div class="section-title">③ 5-axis 更新 + 查表编译 <span class="tag">LLMBehaviorCompiler</span></div>
-    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:0.3rem">element_changes_today × 映射矩阵 → 新 5-axis</div>
-    <div style="font-size:0.7rem">
-      <div>依恋 0.205 <span style="color:var(--green)">+0.008</span> → 0.213</div>
-      <div>信任 0.177 <span style="color:var(--orange)">-0.012</span> → 0.165</div>
-      <div>稳定 0.304 <span style="color:var(--green)">+0.015</span> → 0.319</div>
-      <div>能量 0.284 <span style="color:var(--green)">+0.006</span> → 0.290</div>
-      <div>好奇 0.332 <span style="color:var(--orange)">-0.005</span> → 0.327</div>
-    </div>
-    <div style="margin-top:0.5rem;font-size:0.65rem;color:var(--muted)">LLM 为常见 (event×emotion) 生成行为候选 → 编译查表行</div>
-  </div>
-</div>
+  // Story
+  html += `<div style="margin-top:0.4rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px;font-size:0.6rem;color:var(--gold)">
+    📖 story_id=0x0001 · App 本地存 · 不走 BLE</div>`;
 
-<!-- ==================== ARROW ==================== -->
-<div class="flow-arrow">▶</div>
+  document.getElementById('output-content').innerHTML = html;
+}
 
-<!-- ==================== OUTPUT ==================== -->
-<div class="flow-column">
-  <div style="text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">App → 硬件 ➡</div>
+function renderSnapshotInfo(step) {
+  const s = SAMPLE.oldSnapshot;
+  const ns = SAMPLE.newSnapshot;
+  let html = '';
+  if (step === 0) {
+    html = `<div style="color:var(--muted)">等待开始…</div>`;
+  } else if (step < 5) {
+    // Show current (old)
+    html = `<div class="info-row"><span class="il">wu_xing</span><span class="iv">金${s.metal} 木${s.wood} 水${s.water} 火${s.fire} 土${s.earth}</span></div>
+    <div class="info-row"><span class="il">stage</span><span class="iv">${s.stage} (0x0${s.stageVal})</span></div>
+    <div class="info-row"><span class="il">revision</span><span class="iv">${s.revision}</span></div>`;
+  } else {
+    // Show new
+    html = `<div class="info-row"><span class="il">wu_xing</span><span class="iv" style="color:var(--gold)">金${ns.metal} 木${ns.wood} 水${ns.water} 火${ns.fire} 土${ns.earth}</span></div>
+    <div class="info-row"><span class="il">stage</span><span class="iv">${ns.stage} (0x0${ns.stageVal})</span></div>
+    <div class="info-row"><span class="il">revision</span><span class="iv">${ns.revision} ← ${s.revision}</span></div>
+    <div class="info-row"><span class="il">milestone</span><span class="iv">${ns.milestone} 🆕</span></div>`;
+  }
+  document.getElementById('snapshot-info').innerHTML = html;
+}
 
-  <!-- PetGrowthSnapshot (new) -->
-  <div class="section">
-    <div class="section-title">
-      📷 PetGrowthSnapshot（新）
-      <span class="tag">App→设备</span>
-    </div>
-    <div class="byte-row">
-      <div class="byte blue">0xEA<span class="label">schema</span></div>
-      <div class="byte" style="background:rgba(255,193,7,0.15);border-color:var(--gold)"><b>6E</b><span class="label">金↑110</span></div>
-      <div class="byte" style="background:rgba(76,175,80,0.15);border-color:var(--green)"><b>50</b><span class="label">木=80</span></div>
-      <div class="byte" style="background:rgba(33,150,243,0.15);border-color:var(--blue)"><b>4B</b><span class="label">水↓75</span></div>
-      <div class="byte" style="background:rgba(255,87,34,0.15);border-color:var(--orange)"><b>4C</b><span class="label">火↑76</span></div>
-      <div class="byte" style="background:rgba(141,110,99,0.15);border-color:var(--brown)"><b>3A</b><span class="label">土↓58</span></div>
-      <div class="byte green">03<span class="label">stage=成年</span></div>
-      <div class="byte"><b>3C</b><span class="label">进度=60</span></div>
-      <div class="byte"><b>06</b><span class="label">revision=6</span></div>
-      <div class="byte highlight">00 01<span class="label">milestone=1</span></div>
-    </div>
-    <div style="margin-top:0.3rem;font-size:0.65rem;color:var(--muted)">
-      wu_xing 变化：金+10 水−15 火+6 土−2 · stage 幼年→成年 · revision 5→6
-    </div>
-  </div>
+const STEP_DESCS = [
+  '', // step 0
+  '设备通过 BLE 上报一天内的交互事件。每条 9 字节包含 event_id、时间戳、次数、情绪、情境。模拟里这些事件从文本场景解析，硬件里来自真实传感器。',
+  '模型把原始事件聚合成 8 个比例值（0-1），每个比例描述一天行为的一个维度——触摸多不多、声音互动几次、有没有换花样。',
+  '每个比例跟 0.5 比，高了给某些元素投票，低了给另一些。得票最高的元素权重 +5%，最低的 -5%，相生关系再加 +1%。总和永远 100%。',
+  '五行权重变化 × 映射矩阵 = 5-axis (依恋/信任/稳定/能量/好奇) 的变化量。这是 Beany 性格状态的实际更新。',
+  '写入新快照（11 字节）+ 新查表（每行 7 字节）。LLM 为常见 (event×emotion) 生成 2-3 个候选反应，按权重填表。设备下次命中时加权随机选一个执行。',
+  '' // completed
+];
 
-  <!-- PetBehaviorLookupTable -->
-  <div class="section">
-    <div class="section-title">
-      📋 PetBehaviorLookupTable
-      <span class="tag">App→设备</span>
-    </div>
-    <div style="font-size:0.65rem;color:var(--muted);margin-bottom:0.5rem">整表替换 · 设备只缓存当前一张</div>
-    <div class="byte-row">
-      <div class="byte blue">0xEA<span class="label">schema</span></div>
-      <div class="byte highlight">0x03<span class="label">table_revision</span></div>
-      <div class="byte">00 06<span class="label">item_count=6</span></div>
-    </div>
-    <table class="lookup-table">
-      <tr><th>事件</th><th>情绪</th><th>动作ID</th><th>动作</th><th>声音ID</th><th>震动</th><th>权重</th></tr>
-      <tr><td class="event-name">摸头顶</td><td>ANY</td><td>0x1E</td><td>抬头30°</td><td>0x01</td><td>0</td><td><b>0.8</b></td></tr>
-      <tr><td class="event-name" style="color:var(--muted)">摸头顶</td><td>ANY</td><td>0x05</td><td>抬头60°</td><td>0x02</td><td>0</td><td><b>0.2</b></td></tr>
-      <tr><td class="event-name">摸肚子</td><td>开心</td><td>0x50</td><td>低头30°</td><td>0x13</td><td>1</td><td><b>0.7</b></td></tr>
-      <tr><td class="event-name" style="color:var(--muted)">摸肚子</td><td>开心</td><td>0x55</td><td>左转60°</td><td>0x14</td><td>1</td><td><b>0.3</b></td></tr>
-      <tr><td class="event-name">被拿起</td><td>ANY</td><td>0x62</td><td>抬头90°</td><td>0x1F</td><td>0</td><td><b>1.0</b></td></tr>
-      <tr><td class="event-name">平静语调</td><td>ANY</td><td>0x0B</td><td>抬头90°慢</td><td>0x1F</td><td>0</td><td><b>1.0</b></td></tr>
-    </table>
-    <div style="margin-top:0.4rem;font-size:0.65rem;color:var(--muted)">
-      ✔ 多行命中时按 weight 加权随机 · 权重全 0 则均匀随机
-    </div>
-  </div>
+function updateUI(nextStepIdx) {
+  for (let i = 1; i <= TOTAL; i++) {
+    const el = document.getElementById('step-' + i);
+    if (!el) continue;
+    el.classList.remove('active','done','future');
+    if (i < nextStepIdx) el.classList.add('done');
+    else if (i === nextStepIdx) el.classList.add('active');
+    else el.classList.add('future');
+  }
+  document.getElementById('step-num').textContent = nextStepIdx > TOTAL ? TOTAL : Math.min(nextStepIdx, TOTAL);
+  document.getElementById('step-total').textContent = TOTAL;
 
-  <!-- Story -->
-  <div class="section">
-    <div class="section-title">
-      📖 PetDailyStory
-      <span class="tag">App 本地，不走 BLE</span>
-    </div>
-    <div style="font-size:0.7rem;padding:0.5rem;background:rgba(255,255,255,0.03);border-radius:6px;color:var(--gold)">
-      "Beany 在窗台上晒了一下午太阳，中间翻了个身，把沙发靠垫蹭歪了一点。傍晚听到走廊有脚步声，竖起耳朵听了一会儿——不是主人，又趴回去了。"
-    </div>
-    <div style="margin-top:0.3rem;font-size:0.65rem;color:var(--muted)">
-      story_id=0x0001 · LLM 生成，App 本地存 · 设备不感知
-    </div>
-  </div>
-</div>
+  if (nextStepIdx >= 1 && nextStepIdx <= TOTAL) {
+    document.getElementById('step-desc').innerHTML = STEP_DESCS[nextStepIdx];
+  }
 
-</div>
+  if (nextStepIdx > TOTAL) {
+    document.getElementById('status-text').textContent = '✅ 一天模拟完成';
+    document.getElementById('btn-next').disabled = true;
+    document.getElementById('btn-next').textContent = '✓ 完成';
+  } else if (nextStepIdx === 0) {
+    document.getElementById('status-text').textContent = '就绪';
+    document.getElementById('btn-next').disabled = false;
+    document.getElementById('btn-next').textContent = '▶ 模拟一天';
+  } else {
+    document.getElementById('status-text').textContent = `步骤 ${nextStepIdx}/${TOTAL}`;
+    document.getElementById('btn-next').disabled = false;
+    document.getElementById('btn-next').textContent = '▶ 下一步';
+  }
 
-<!-- ==================== BOTTOM SUMMARY ==================== -->
-<div style="margin-top:2rem;padding:1.2rem;background:var(--card);border:1px solid var(--border);border-radius:12px">
-  <h2 style="font-size:0.9rem;margin-bottom:0.5rem">📐 模型库接口定义（KMM）</h2>
+  renderSnapshotInfo(nextStepIdx);
+}
 
-  <table style="width:100%;font-size:0.75rem;border-collapse:collapse">
-    <tr><th style="text-align:left;color:var(--muted);width:8rem;padding:0.5rem 0.3rem;border-bottom:1px solid var(--border)">方法</th>
-        <th style="text-align:left;color:var(--muted);padding:0.5rem 0.3rem;border-bottom:1px solid var(--border)">Input</th>
-        <th style="text-align:left;color:var(--muted);padding:0.5rem 0.3rem;border-bottom:1px solid var(--border)">Output</th></tr>
-    <tr><td style="padding:0.5rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.04);font-family:monospace">dailyUpdate(interactions, snapshot)</td>
-        <td style="padding:0.5rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.04)">
-          PetInteractionEventBatch · PetGrowthSnapshot?
-        </td>
-        <td style="padding:0.5rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.04)">
-          PetGrowthSnapshot · PetBehaviorLookupTable · 8 ratios
-        </td></tr>
-    <tr><td style="padding:0.5rem 0.3rem;font-family:monospace">generateStory(snapshot, ratios)</td>
-        <td style="padding:0.5rem 0.3rem">
-          PetGrowthSnapshot · 8 daily ratios
-        </td>
-        <td style="padding:0.5rem 0.3rem">
-          story_id: uint16
-        </td></tr>
-  </table>
-</div>
+function nextStep() {
+  step++;
+  if (step === 1) renderEvents();
+  if (step === 2) renderRatios();
+  if (step === 3) renderVote();
+  if (step === 4) renderAxis();
+  if (step === 5) renderOutput();
+  updateUI(step);
+}
 
-<div style="margin-top:1rem;text-align:center;font-size:0.65rem;color:var(--muted)">
-  Beany Simulator · Model I/O Demo · v0.2 · 硬件协议适配版本
-</div>
+function resetFlow() {
+  step = 0;
+  document.getElementById('events-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待模拟一天…</div>';
+  document.getElementById('ratios-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
+  document.getElementById('vote-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
+  document.getElementById('axis-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
+  document.getElementById('output-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
+  updateUI(0);
+}
 
+// Boot
+updateUI(0);
+</script>
 </body>
 </html>
