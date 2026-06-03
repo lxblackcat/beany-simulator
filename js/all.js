@@ -876,7 +876,7 @@ function prevNode() {
   document.getElementById('story-area').scrollTop=0;
 }
 
-function updateBeanyColor(){if(state.beanyAnimator)state.beanyAnimator.setColor(getCurrentRun()?.color||'#888');}
+function updateBeanyColor(){if(state.beanyAnimator)state.beanyAnimator.setColor(getNodeColor(getCurrentNode(),getCurrentRun())||'#888');}
 
 function showNodeSummary(){
   const n=getCurrentNode();if(!n)return;
