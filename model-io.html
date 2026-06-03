@@ -1207,24 +1207,24 @@ function renderOutput() {
   
   // Row: statefulness  
   html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);width:5rem">状态性</td>'
-    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)"><span style="color:var(--green)">有状态，状态全部在 PetGrowthSnapshot（11 字节）中</span><br>Day N 的权重/5-axis 更新只依赖 Day N-1 的 snapshot + 当天事件。不需要完整历史回放。没有隐藏的状态树或推演路径。</td></tr>';
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)"><span style="color:var(--green)">模型库自身无持久状态</span><br>所有必要数据通过参数传入传出。设备只需持久化最新 snapshot + 查表 + ID 列表，即可完整恢复模型运行。没有隐藏的状态树。</td></tr>';
   
   // Row: storage needed
   html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">需存档数据</td>'
     + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">'
-    + 'PetGrowthSnapshot <span style="color:var(--gold)">11B</span> + 当前查表 <span style="color:var(--gold)">~700B</span> + 里程碑ID列表 <span style="color:var(--gold)">~100B</span> + 故事ID列表 <span style="color:var(--gold)">~100B</span> = <span style="color:var(--gold);font-weight:600">总计约 1KB</span>，可全部存入设备</td></tr>';
+    + 'PetGrowthSnapshot <span style="color:var(--gold)">11B</span> + PetBehaviorLookupTable <span style="color:var(--gold)">~700B</span> + 里程碑/故事ID列表 <span style="color:var(--gold)">~200B</span> + 交友记录 <span style="color:var(--gold)">~200B</span> = <span style="color:var(--gold);font-weight:600">总计约 1.1KB</span>，可全部存入设备</td></tr>';
   
   // Row: input  
   html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">输入参数</td>'
-    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">currentSnapshot <span style="color:var(--text-muted)">·</span> todayEvents <span style="color:var(--text-muted)">·</span> unlockedMilestones: uint16[] <span style="color:var(--text-muted)">·</span> existingStoryIds: uint16[]</td></tr>';
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">currentSnapshot: PetGrowthSnapshot <span style="color:var(--text-muted)">·</span> todayEvents: PetInteractionEventBatch <span style="color:var(--text-muted)">·</span> unlockedMilestones: UInt16[]<br>existingStoryIds: UInt16[] <span style="color:var(--text-muted)">·</span> socialRecords: PetSocialEncounterRecordList?</td></tr>';
   
   // Row: output
   html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">输出参数</td>'
-    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">newSnapshot <span style="color:var(--text-muted)">·</span> newLookupTable <span style="color:var(--text-muted)">·</span> newMilestones <span style="color:var(--text-muted)">·</span> newStoryId</td></tr>';
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">newSnapshot: PetGrowthSnapshot <span style="color:var(--text-muted)">·</span> newLookupTable: PetBehaviorLookupTable?<br>newMilestones: UInt16[] <span style="color:var(--text-muted)">·</span> newStoryId: UInt16? <span style="color:var(--text-muted)">·</span> newSocial: PetSocialEncounterRecordList?</td></tr>';
   
   // Row: Kotlin method signature
   html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem">KMM 接口</td>'
-    + '<td style="padding:0.3rem 0.3rem;font-family:var(--font-mono);font-size:0.5rem;color:var(--text-secondary)">fun dailyUpdate(snapshot: PetGrowthSnapshot?, events: PetInteractionEventBatch, milestones: List&lt;UShort&gt;, stories: List&lt;UShort&gt;): DailyUpdateResult</td></tr>';
+    + '<td style="padding:0.3rem 0.3rem;font-family:var(--font-mono);font-size:0.5rem;color:var(--text-secondary)">fun dailyUpdate(snapshot: PetGrowthSnapshot, events: PetInteractionEventBatch, milestones: List&lt;UShort&gt;, stories: List&lt;UShort&gt;, social: PetSocialEncounterRecordList?): DailyUpdateResult</td></tr>';
   
   html += '</table></div>';
 
