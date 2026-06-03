@@ -952,8 +952,8 @@ body::before {
       </div>
       <div class="opt" id="opt-reincarnate" onclick="selectOpt('reincarnate')">
         <h4>✨ 转世</h4>
-        <p>自选锁定到过去某天的模型状态。五行向量保留，阶段重置为幼年，生成全新查表。</p>
-        <div class="opt-detail">五行<span style="color:var(--gold)">保留</span> · stage→<span style="color:var(--gold)">幼年</span> · 查表<span style="color:var(--gold)">全新</span> · 里程碑/故事<span style="color:var(--gold)">保留</span></div>
+        <p>放弃今生，回到前世选中那天，从那天走到 Day 30。</p>
+        <div class="opt-detail">五行·里程碑·故事<span style="color:var(--gold)">沿用前世</span> · stage→<span style="color:var(--gold)">幼年</span> · 查表<span style="color:var(--gold)">全新</span></div>
       </div>
     </div>
     <div class="opt-result" id="opt-result">点击选项查看影响</div>
@@ -1314,13 +1314,7 @@ function setTimelineClass(days, cls) {
   }
 }
 
-let rebirthDone = false;
-
 function selectOpt(id) {
-  if (id === 'reincarnate' && !rebirthDone) {
-    document.getElementById('opt-result').innerHTML = '⚠️ 必须先选「重生」清零后，才能使用转世。'; 
-    return; 
-  }
   document.querySelectorAll('.opt').forEach(o => o.style.borderColor = '');
   document.getElementById('opt-'+id).style.borderColor = 'var(--gold)';
   
@@ -1356,7 +1350,6 @@ function selectOpt(id) {
         clearInterval(clearId);
         setTimelineClass('', 'future');
         document.getElementById('tl-1').className = 'tl-day active';
-        rebirthDone = true;
         di.innerHTML = '<b>✅ 重生完成</b><br>权重: 金20 木20 水20 火20 土20 (均匀)<br>stage: 幼年 · revision: 0 · 全部历史已擦除';
         document.getElementById('opt-result').innerHTML = '🔄 重生完成！从均匀权重（20%）重新培育。<br><span style="color:var(--gold)">⏳ 自动进入养成周期...</span>'; 
         
