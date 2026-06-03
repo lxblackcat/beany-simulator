@@ -1401,7 +1401,7 @@ function selectOpt(id) {
     // Initial: show two rounds
     di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
       + '<span style="color:var(--blue);font-weight:600">🔵 第一轮·已完成30天</span><br>'
-      + '<span style="font-size:0.5rem;color:var(--text-muted)">Day1→⋯→<span style="color:var(--gold)">Day27(巅峰)</span>→Day28→Day29→Day30→<span style="color:var(--orange)">重生</span></span><br>'
+      + '<span style="font-size:0.5rem;color:var(--text-muted)">Day1→⋯→<span style="color:var(--gold)">选择某天</span>→Day28→Day29→Day30→<span style="color:var(--orange)">重生</span></span><br>'
       + '<span style="color:var(--green);font-weight:600;margin-top:0.3rem;display:inline-block">🟢 第二轮·重生后养到Day10</span><br>'
       + '<span style="font-size:0.5rem;color:var(--text-muted)">Day1→⋯→Day10(当前，不喜欢)</span></div>';
     
@@ -1420,9 +1420,9 @@ function selectOpt(id) {
         
         const dots = '.'.repeat(frame);
         di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
-          + '<span style="color:var(--blue);font-weight:600">🔵 回忆前世·找到Day27</span><br>'
-          + '<span style="font-size:0.5rem;color:var(--text-muted)">前世Day27五行: <span style="color:var(--gold)">金110 木65 水85 火72 土45</span></span></div>';
-        document.getElementById('opt-result').textContent = '✨ 找到前世 Day27 巅峰状态 ✓';
+          + '<span style="color:var(--blue);font-weight:600">🔵 回忆前世·用户选中某天</span><br>'
+          + '<span style="font-size:0.5rem;color:var(--text-muted)">继承该天的五行: <span style="color:var(--gold)">金110 木65 水85 火72 土45</span></span></div>';
+        document.getElementById('opt-result').textContent = '✨ 找到前世选中的某天状态 ✓';
       } else if (frame <= 7) {
         // Phase 2: carry over wu_xing, fast-forward to finale
         const p = (frame - 3) / 4;
@@ -1441,10 +1441,10 @@ function selectOpt(id) {
         document.getElementById('tl-13').className = 'tl-day active';
         
         di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
-          + '<span style="color:var(--gold);font-weight:600">✨ 继承前世巅峰状态·直接进入终章</span><br>'
-          + '<span style="font-size:0.5rem">五行: 金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + ' (← 前世Day27)</span><br>'
+          + '<span style="color:var(--gold);font-weight:600">✨ 继承前世状态·直接进入终章</span><br>'
+          + '<span style="font-size:0.5rem">五行: 金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + ' (← 前世选中那天)</span><br>'
           + '<span style="font-size:0.5rem;color:var(--text-muted)">跳过中间20天 · 直接进入结局最后3天</span></div>';
-        document.getElementById('opt-result').textContent = '✨ 继承前世五行，跳过中间养成的20天...';
+        document.getElementById('opt-result').textContent = '✨ 继承前世五行，跳过中间天数...';
       } else {
         // Phase 3: complete — finale stories playing
         setTimelineClass('', 'future');
@@ -1457,10 +1457,10 @@ function selectOpt(id) {
         
         di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem;padding:0.4rem;background:var(--gold-glow);border:1px solid rgba(240,180,41,0.15);border-radius:var(--rad-sm)">'
           + '<span style="color:var(--gold);font-weight:600">📖 最后3天的故事...</span><br>'
-          + '<span style="font-size:0.55rem">"有了前世 Day27 的性格，Beany 在这最后3天里展现出前所未有的信任与默契...</span><br>'
+          + '<span style="font-size:0.55rem">"继承了前世最佳状态的性格，Beany 在这最后3天里展现出前所未有的信任与默契...</span><br>'
           + '<span style="font-size:0.55rem">它记得你，也记得自己是谁。"</span></div>'
           + '<span style="font-size:0.5rem;color:var(--green)">✅ 第三轮·转世结局 · stage: 幼年 · 查表: 全新生成 · 里程碑/故事保留</span>';
-        document.getElementById('opt-result').innerHTML = '✨ 转世结局完成！继承前世 Day27 的最佳性格，体验了最后 3 天的圆满故事。<br><span style="color:var(--gold)">即将进入 Stable 稳定期</span>';
+        document.getElementById('opt-result').innerHTML = '✨ 转世结局完成！继承前世选定日期的性格，体验了最后 3 天的圆满故事。<br><span style="color:var(--gold)">即将进入 Stable 稳定期</span>';
         clearInterval(clearId);
       }
     }, 350);
