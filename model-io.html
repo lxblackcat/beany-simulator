@@ -1153,20 +1153,18 @@ function renderOutput() {
     + '<b>💡 所有 49 种事件（摸头顶/摸肚子/被拿起/…）在查表中都有行</b>。五行的区别只在 <span style="color:var(--gold)">weight（概率）</span>这一列不同。<br>'
     + '木 Beany 和 金 Beany 的查表「摸头顶」都有 2 行（轻蹭+撒娇），但木的 <span style="color:var(--gold)">weight</span>=204(80%)，金的 <span style="color:var(--gold)">weight</span>=77(30%)。</div>';
 
-  html += `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.15rem">PetGrowthSnapshot 协议结构（11 字节）</div>
-  <div class="byte-row">
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">EA<span class="bl" style="color:var(--gold)">schema</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.metal.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[0]金属</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.wood.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[1]木</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.water.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[2]水</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.fire.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[3]火</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.earth.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[4]土</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">0x0${ns.stageVal}<span class="bl" style="color:var(--gold)">stage</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.growValue.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">stage_grow</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">0x0${ns.revision}<span class="bl" style="color:var(--gold)">state_rev</span></div>
-      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.milestone}<span class="bl" style="color:var(--gold)">milestone</span></div>
+  html += `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.15rem">PetGrowthSnapshot (Protobuf  · 设备侧27B)</div>
+  <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.3rem;font-size:0.55rem">
+    <span style="background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.2);border-radius:3px;padding:0.1rem 0.35rem">WuXingVector<br><span style="color:var(--gold);font-size:0.5rem">metal wood water fire earth</span></span>
+    <span style="background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.2);border-radius:3px;padding:0.1rem 0.35rem">stage<br><span style="color:var(--gold);font-size:0.5rem">PetLifeStage</span></span>
+    <span style="background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.2);border-radius:3px;padding:0.1rem 0.35rem">stage_grow<br><span style="color:var(--gold);font-size:0.5rem">uint32</span></span>
+    <span style="background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.2);border-radius:3px;padding:0.1rem 0.35rem">state_revision<br><span style="color:var(--gold);font-size:0.5rem">uint64</span></span>
+    <span style="background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.2);border-radius:3px;padding:0.1rem 0.35rem">updated_at<br><span style="color:var(--gold);font-size:0.5rem">uint32 unix</span></span>
+    <span style="background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.2);border-radius:3px;padding:0.1rem 0.35rem">milestone<br><span style="color:var(--gold);font-size:0.5rem">PetGrowthMilestone</span></span>
   </div>
-  <div style="font-size:0.45rem;color:var(--text-muted);margin-top:0.1rem">协议字段：schema(1B) · wu_xing[5](5B) · stage(1B) · stage_grow_value(1B) · state_revision(1B) · milestone(2B)</div>`;
+  <div style="font-size:0.5rem;color:var(--text-muted)">
+    示例: wu_xing:metal=${ns.metal} wood=${ns.wood} water=${ns.water} fire=${ns.fire} earth=${ns.earth} · ${ns.stage} · rev=${ns.revision} · milestone=${ns.milestone}
+  </div>`;
 
   // ========== TABLE SHOWING WEIGHT DIFFERENCE ==========
   html += '<div style="margin-top:0.4rem;font-size:0.6rem;font-weight:600">📋 查表里「摸头顶」的 2 行（木 vs 金）</div>';
@@ -1203,17 +1201,42 @@ function renderOutput() {
     + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">'
     + 'PetGrowthSnapshot <span style="color:var(--gold)">11B</span> + PetBehaviorLookupTable <span style="color:var(--gold)">~700B</span> + 里程碑/故事ID列表 <span style="color:var(--gold)">~200B</span> + 交友记录 <span style="color:var(--gold)">~200B</span> = <span style="color:var(--gold);font-weight:600">总计约 1.1KB</span>，可全部存入设备</td></tr>';
   
-  // Row: input  
-  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">输入参数</td>'
-    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">currentSnapshot: PetGrowthSnapshot <span style="color:var(--text-muted)">·</span> todayEvents: PetInteractionEventBatch <span style="color:var(--text-muted)">·</span> unlockedMilestones: UInt16[]<br>existingStoryIds: UInt16[] <span style="color:var(--text-muted)">·</span> socialRecords: PetSocialEncounterRecordList?</td></tr>';
+  // Row: service  
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);width:5rem">RPC 服务</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:0.5rem;color:var(--text-secondary)">'
+    + 'service PetGrowthComputation {<br>'
+    + '&nbsp;&nbsp;rpc ComputePetGrowth(PetEventsSnapshotInput) returns (PetGrowthModelResponse);<br>'
+    + '&nbsp;&nbsp;rpc InitializePetFromPersonalityQuiz(PetPersonalityInitRequest) returns (PetGrowthModelResponse);<br>'
+    + '&nbsp;&nbsp;rpc ResetPetGrowth(ResetPetGrowthRequest) returns (PetGrowthModelResponse);<br>'
+    + '}<br><br>'
+    + 'service PetNarrativeGeneration {<br>'
+    + '&nbsp;&nbsp;rpc GeneratePetInteractionRecords(PetEventsSnapshotInput) returns (GeneratePetInteractionRecordsResponse);<br>'
+    + '&nbsp;&nbsp;rpc GeneratePetDiary(PetEventsSnapshotInput) returns (GeneratePetDiaryResponse);<br>'
+    + '&nbsp;&nbsp;rpc PetDialogue(PetDialogueRequest) returns (PetDialogueResponse);<br>'
+    + '}'
+    + '</td></tr>';
+  
+  // Row: input (PetEventsSnapshotInput)
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">ComputePetGrowth 请求</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);font-size:0.55rem">'
+    + 'PetEventsSnapshotInput { event_batch: PetInteractionEventBatch, snapshot: PetGrowthSnapshot }</td></tr>';
   
   // Row: output
-  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">输出参数</td>'
-    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">newSnapshot: PetGrowthSnapshot <span style="color:var(--text-muted)">·</span> newLookupTable: PetBehaviorLookupTable?<br>newMilestones: UInt16[] <span style="color:var(--text-muted)">·</span> newStoryId: UInt16? <span style="color:var(--text-muted)">·</span> newSocial: PetSocialEncounterRecordList?</td></tr>';
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">响应</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);font-size:0.55rem">'
+    + 'PetGrowthModelResponse { new_lookup_table: PetBehaviorLookupTable, new_snapshot: PetGrowthSnapshot }</td></tr>';
   
-  // Row: Kotlin method signature
-  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem">KMM 接口</td>'
-    + '<td style="padding:0.3rem 0.3rem;font-family:var(--font-mono);font-size:0.5rem;color:var(--text-secondary)">fun dailyUpdate(snapshot: PetGrowthSnapshot, events: PetInteractionEventBatch, milestones: List&lt;UShort&gt;, stories: List&lt;UShort&gt;, social: PetSocialEncounterRecordList?): DailyUpdateResult</td></tr>';
+  // Row: Reset
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">ResetPetGrowth</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);font-size:0.55rem">'
+    + 'ResetPetGrowthRequest { reset_type: REBIRTH | REINCARNATION, prior_snapshot?: PetGrowthSnapshot }</td></tr>';
+  
+  // Row: Narrative + Dialogue
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem">叙事/对话</td>'
+    + '<td style="padding:0.3rem 0.3rem;font-size:0.55rem">'
+    + 'GeneratePetInteractionRecords → PetInteractionRecordLine[]<br>'
+    + 'GeneratePetDiary → diary_text<br>'
+    + 'PetDialogue(snapshot + user_utterance) → pet_reply_text</td></tr>';
   
   html += '</table></div>';
 
@@ -1251,7 +1274,7 @@ const STEP_DESCS = [
   '模型把原始事件聚合成 8 个比例值（0-1），每个比例描述一天行为的一个维度——触摸多不多、声音互动几次、有没有换花样。',
   '每个比例跟 0.5 比，高了给某些元素投票，低了给另一些。得票最高的元素权重 +5%，最低的 -5%，相生关系再加 +1%。总和永远 100%。',
   '五行权重变化 × 映射矩阵 = 5-axis (依恋/信任/稳定/能量/好奇) 的变化量。这是 Beany 性格状态的实际更新。',
-  '写入新快照（11 字节）+ 输出查表。所有事件在查表中都有行，五行不决定「有没有」这个事件，只决定「同一个事件不同五行」的概率权重不同。我们做的事：给每行填 random_weight（0-255），LLM 根据当前性格打分归一化。',
+  '写入新快照（PetGrowthSnapshot Protobuf）+ 输出查表（PetBehaviorLookupTable）。所有事件在查表中都有行，五行不决定「有没有」这个事件，只决定「同一个事件不同五行」的概率权重不同。我们做的事：给每行填 random_weight，LLM 根据当前性格打分归一化。',
   ''
 ];
 
