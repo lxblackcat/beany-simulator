@@ -1280,7 +1280,7 @@ function renderTimeline() {
   let h = '';
   for (let d = 1; d <= 30; d++) {
     const cls = d < 5 ? 'done' : (d === 5 ? 'active' : (d > 28 ? 'end' : 'future'));
-    h += '<div class="tl-day ' + cls + '" onclick="showDay(' + d + ')">' + d + '</div>';
+    h += '<div class="tl-day ' + cls + '" id="tl-' + d + '" onclick="showDay(' + d + ')">' + d + '</div>';
   }
   document.getElementById('timeline').innerHTML = h;
 }
@@ -1298,6 +1298,13 @@ function showDay(d) {
     '<br>主导: <span style="color:' + elemColors[maxIdx] + '">' + elemNames[maxIdx] + '</span>';
 }
 
+function setTimelineClass(days, cls) {
+  for (let d = 1; d <= 30; d++) {
+    const el = document.getElementById('tl-' + d);
+    if (el) { el.className = 'tl-day ' + cls; }
+  }
+}
+
 function selectOpt(id) {
   document.querySelectorAll('.opt').forEach(o => o.style.borderColor = '');
   document.getElementById('opt-'+id).style.borderColor = 'var(--gold)';
@@ -1305,79 +1312,120 @@ function selectOpt(id) {
   const di = document.getElementById('day-info');
   
   if (id === 'rebirth') {
-    // Animate: weights resetting to uniform, day by day
-    let frame = 0;
-    const totalFrames = 10;
-    const clearId = setInterval(() => {
-      frame++;
-      const progress = frame / totalFrames;
-      // Decay weights from current toward uniform (20 each)
-      const cur = [80, 70, 60, 55, 50]; // current simulated weights
-      const target = [20, 20, 20, 20, 20];
-      const w = cur.map((c, i) => Math.round(c + (target[i] - c) * Math.min(progress * 1.5, 1)));
-      const maxIdx = w.indexOf(Math.max(...w));
-      const elemNames = ['金','木','水','火','土'];
-      const elemColors = ['#f0b429','#34d399','#22d3ee','#f97316','#8D6E63'];
-      const barHtml = elemNames.map((n, i) => {
-        const col = elemColors[i];
-        return '<span style="display:inline-block;width:' + (w[i]*2) + 'px;height:8px;background:' + col + ';border-radius:4px;margin-right:4px"></span>' + n + w[i];
-      }).join(' ');
-      di.innerHTML = '<b>🔄 重生中... ' + Math.round(progress*100) + '%</b><br>' + barHtml + '<br>stage: 幼年 · revision: 0 · 历史数据擦除中'; 
-      document.getElementById('opt-result').innerHTML = '🔄 权重逐渐归零... <span style="color:var(--gold)">金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + '</span>';
-      if (frame >= totalFrames) {
-        clearInterval(clearId);
-        di.innerHTML = '<b>✅ 重生完成</b><br>权重: 金20 木20 水20 火20 土20 (均匀)<br>stage: 幼年 · revision: 0 · 全部历史已擦除';
-        document.getElementById('opt-result').innerHTML = '🔄 重生完成！从均匀权重（20%）重新培育。';
-      }
-    }, 120);
-  }
-  
-  else if (id === 'continue') {
-    // Animate: timeline stopping, weights locking
-    let frame = 0;
-    const totalFrames = 8;
-    const clearId = setInterval(() => {
-      frame++;
-      const progress = frame / totalFrames;
-      if (frame <= 3) {
-        const w = [80, 70, 60, 55, 50];
-        di.innerHTML = '<b>🌿 续养中...</b><br>金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + ' → <span style="color:var(--gold)">锁定中</span><br>stage: 青年 → <span style="color:var(--gold)">Stable</span>';
-        document.getElementById('opt-result').textContent = '🌿 权重锁定中... · Stage 转入 Stable';  
-      } else if (frame <= 6) {
-        di.innerHTML = '<b>🌿 已稳定</b><br>权重: <span style="color:var(--gold)">金80 木70 水60 火55 土50 已冻结</span><br>stage: Stable · 不再产生新数据';
-        document.getElementById('opt-result').textContent = '🌿 已进入 Stable，权重冻结。查表沿用，后续无新数据。';
-      } else {
-        di.innerHTML = '<b>🌿 续养完成</b><br>权重: 金80 木70 水60 火55 土50 <span style="color:var(--gold)">(∞ 永久冻结)</span><br>stage: Stable · 里程碑/故事保留 · 不再新增';
-        document.getElementById('opt-result').textContent = '🌿 续养完成。Beany 进入稳定期，永久保持当前性格。';
-        clearInterval(clearId);
-      }
-    }, 200);
-  }
-  
-  else if (id === 'reincarnate') {
-    // Animate: jump to past state (Day 27), restore weights, reset stage
     let frame = 0;
     const totalFrames = 12;
     const clearId = setInterval(() => {
       frame++;
       const progress = frame / totalFrames;
+      const cur = [80, 70, 60, 55, 50];
+      const target = [20, 20, 20, 20, 20];
+      const w = cur.map((c, i) => Math.round(c + (target[i] - c) * Math.min(progress * 1.5, 1)));
+      const elemNames = ['金','木','水','火','土'];
+      const elemColors = ['#f0b429','#34d399','#22d3ee','#f97316','#8D6E63'];
+      const barHtml = elemNames.map((n, i) => {
+        return '<span style="display:inline-block;width:' + (w[i]*2) + 'px;height:8px;background:' + elemColors[i] + ';border-radius:4px;margin-right:4px"></span>' + n + w[i];
+      }).join(' ');
+      
+      // Timeline: days fade out one by one
+      if (frame <= 10) {
+        for (let d = 1; d <= frame; d++) {
+          const el = document.getElementById('tl-' + d);
+          if (el) el.className = 'tl-day future';
+        }
+      }
+      if (frame === 5) setTimelineClass('', 'future');
+      
+      di.innerHTML = '<b>🔄 重生中... ' + Math.round(progress*100) + '%</b><br>' + barHtml + '<br>stage: 幼年 · revision: 0 · 历史数据擦除中'; 
+      document.getElementById('opt-result').innerHTML = '🔄 权重逐渐归零... <span style="color:var(--gold)">金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + '</span>';
+      if (frame >= totalFrames) {
+        clearInterval(clearId);
+        setTimelineClass('', 'future');
+        document.getElementById('tl-1').className = 'tl-day active';
+        di.innerHTML = '<b>✅ 重生完成</b><br>权重: 金20 木20 水20 火20 土20 (均匀)<br>stage: 幼年 · revision: 0 · 全部历史已擦除';
+        document.getElementById('opt-result').innerHTML = '🔄 重生完成！从均匀权重（20%）重新培育。'; 
+      }
+    }, 150);
+  }
+  
+  else if (id === 'continue') {
+    let frame = 0;
+    const totalFrames = 10;
+    const clearId = setInterval(() => {
+      frame++;
       if (frame <= 4) {
-        // Searching
+        const w = [80, 70, 60, 55, 50];
+        di.innerHTML = '<b>🌿 续养中...</b><br>金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + ' → <span style="color:var(--gold)">锁定中</span><br>stage: 青年 → <span style="color:var(--gold)">Stable</span>';
+        document.getElementById('opt-result').textContent = '🌿 权重锁定中... · Stage 转入 Stable';
+      } else if (frame <= 7) {
+        setTimelineClass('', 'end');
+        for (let d = 1; d <= 5; d++) {
+          const el = document.getElementById('tl-' + d);
+          if (el) el.className = 'tl-day done';
+        }
+        document.getElementById('tl-5').className = 'tl-day active';
+        di.innerHTML = '<b>🌿 已稳定</b><br>权重: <span style="color:var(--gold)">金80 木70 水60 火55 土50 已冻结</span><br>stage: Stable · 不再产生新数据';
+        document.getElementById('opt-result').textContent = '🌿 已进入 Stable，权重冻结。查表沿用，后续无新数据。';
+      } else {
+        // Lock icon on remaining days
+        for (let d = 6; d <= 30; d++) {
+          const el = document.getElementById('tl-' + d);
+          if (el) { el.className = 'tl-day end'; el.innerHTML = '🔒'; }
+        }
+        for (let d = 1; d <= 5; d++) {
+          const el = document.getElementById('tl-' + d);
+          if (el) el.innerHTML = String(d);
+        }
+        di.innerHTML = '<b>🌿 续养完成</b><br>权重: 金80 木70 水60 火55 土50 <span style="color:var(--gold)">(∞ 永久冻结)</span><br>stage: Stable · 里程碑/故事保留 · 不再新增';
+        document.getElementById('opt-result').textContent = '🌿 续养完成。Beany 进入稳定期，永久保持当前性格。';
+        clearInterval(clearId);
+      }
+    }, 250);
+  }
+  
+  else if (id === 'reincarnate') {
+    let frame = 0;
+    const totalFrames = 14;
+    const clearId = setInterval(() => {
+      frame++;
+      if (frame <= 5) {
         const dots = '.'.repeat(frame);
-        di.innerHTML = '<b>✨ 寻找前世记忆' + dots + '</b><br>扫描历史存档... Day 27 找到 ✓';
+        // Timeline scanning effect
+        const scanDay = frame * 5;
+        di.innerHTML = '<b>✨ 寻找前世记忆' + dots + '</b><br>扫描历史存档... Day ' + scanDay + ' ✓';
+        for (let d = 1; d <= 30; d++) {
+          const el = document.getElementById('tl-' + d);
+          if (el) { el.className = d <= scanDay ? 'tl-day done' : 'tl-day future'; }
+        }
         document.getElementById('opt-result').textContent = '✨ 正在搜索历史最佳状态...';
-      } else if (frame <= 8) {
-        // Restoring
-        const p = (frame - 4) / 4;
+      } else if (frame <= 9) {
+        // Found Day 27 — highlight it
+        setTimelineClass('', 'future');
+        document.getElementById('tl-27').className = 'tl-day active';
+        for (let d = 1; d <= 27; d++) {
+          const el = document.getElementById('tl-' + d);
+          if (el && d !== 27) el.className = 'tl-day done';
+        }
+        
+        const p = (frame - 5) / 4;
         const w = [80, 70, 60, 55, 50].map((v, i) => {
-          const restore = [110, 65, 85, 72, 45][i]; // Day 27 weights
-          return Math.round(v + (restore - v) * p);
+          const restore = [110, 65, 85, 72, 45][i];
+          return Math.round(v + (restore - v) * Math.min(p, 1));
         });
         di.innerHTML = '<b>✨ 恢复前世状态...</b><br>金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + '<br>stage: 青年 → <span style="color:var(--gold)">幼年</span> · 查表: <span style="color:var(--gold)">重新生成</span>';
         document.getElementById('opt-result').textContent = '✨ 五行向量保留，阶段重置为幼年...';
       } else {
+        // Complete: show Day 27-30 as timeline, future days locked
+        setTimelineClass('', 'end');
+        for (let d = 1; d <= 27; d++) {
+          const el = document.getElementById('tl-' + d);
+          if (el) el.className = 'tl-day done';
+        }
+        document.getElementById('tl-28').className = 'tl-day active';
+        document.getElementById('tl-29').className = 'tl-day future';
+        document.getElementById('tl-30').className = 'tl-day end';
+        
         di.innerHTML = '<b>✨ 转世完成</b><br>五行: <span style="color:var(--gold)">金110 木65 水85 火72 土45</span> (Day 27 状态)<br>stage: 幼年 · 查表: 全新生成 ✅<br>里程碑/故事保留 · 继续最后 3 天 → Stable';
-        document.getElementById('opt-result').innerHTML = '✨ 转世完成！回到 Day 27 状态（五行保留），stage 重置为幼年，查表全新生成。<br><span style="color:var(--muted);font-size:0.55rem">继续养成 3 天后进入 Stable 稳定期</span>';
+        document.getElementById('opt-result').innerHTML = '✨ 转世完成！回到 Day 27 状态，stage 重置为幼年，查表全新生成。<br><span style="color:var(--muted);font-size:0.55rem">继续养成 3 天后进入 Stable 稳定期</span>';
         clearInterval(clearId);
       }
     }, 200);
