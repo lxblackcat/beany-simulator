@@ -1356,34 +1356,25 @@ function selectOpt(id) {
   
   else if (id === 'continue') {
     let frame = 0;
-    const totalFrames = 10;
+    const totalFrames = 8;
     const clearId = setInterval(() => {
       frame++;
-      if (frame <= 4) {
-        const w = [80, 70, 60, 55, 50];
-        di.innerHTML = '<b>🌿 续养中...</b><br>金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + ' → <span style="color:var(--gold)">锁定中</span><br>stage: 青年 → <span style="color:var(--gold)">Stable</span>';
-        document.getElementById('opt-result').textContent = '🌿 权重锁定中... · Stage 转入 Stable';
-      } else if (frame <= 7) {
-        setTimelineClass('', 'end');
-        for (let d = 1; d <= 5; d++) {
-          const el = document.getElementById('tl-' + d);
-          if (el) el.className = 'tl-day done';
-        }
-        document.getElementById('tl-5').className = 'tl-day active';
-        di.innerHTML = '<b>🌿 已稳定</b><br>权重: <span style="color:var(--gold)">金80 木70 水60 火55 土50 已冻结</span><br>stage: Stable · 不再产生新数据';
-        document.getElementById('opt-result').textContent = '🌿 已进入 Stable，权重冻结。查表沿用，后续无新数据。';
+      if (frame <= 3) {
+        // Phase 1: scan all 30 days as completed
+        setTimelineClass('', 'done');
+        document.getElementById('tl-30').className = 'tl-day active';
+        di.innerHTML = '<b>🌿 30 天完成，选择续养...</b><br>所有历史数据保留 · 权重准备冻结';
+        document.getElementById('opt-result').textContent = '🌿 30天已满，即将进入 Stable 稳定期...';
+      } else if (frame <= 6) {
+        // Phase 2: freeze animation
+        document.getElementById('tl-30').className = 'tl-day end';
+        di.innerHTML = '<b>🌿 已锁定</b><br>权重: <span style="color:var(--gold)">金80 木70 水60 火55 土50 已冻结</span><br>stage: Stable · 不再产生新数据';
+        document.getElementById('opt-result').textContent = '🌿 权重已冻结，Stage 转入 Stable。查表沿用。';
       } else {
-        // Lock icon on remaining days
-        for (let d = 6; d <= 30; d++) {
-          const el = document.getElementById('tl-' + d);
-          if (el) { el.className = 'tl-day end'; el.innerHTML = '🔒'; }
-        }
-        for (let d = 1; d <= 5; d++) {
-          const el = document.getElementById('tl-' + d);
-          if (el) el.innerHTML = String(d);
-        }
-        di.innerHTML = '<b>🌿 续养完成</b><br>权重: 金80 木70 水60 火55 土50 <span style="color:var(--gold)">(∞ 永久冻结)</span><br>stage: Stable · 里程碑/故事保留 · 不再新增';
-        document.getElementById('opt-result').textContent = '🌿 续养完成。Beany 进入稳定期，永久保持当前性格。';
+        // Phase 3: done - show all days done with a lock overlay
+        const w = [80, 70, 60, 55, 50];
+        di.innerHTML = '<b>🌿 续养完成</b><br>权重: <span style="color:var(--gold)">金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + ' (∞ 永久冻结)</span><br>stage: Stable · 里程碑/故事/行为记录：<span style="color:var(--green)">全部保留</span><br>故事：<span style="color:var(--orange)">停止更新</span> · 查表：沿用当前';
+        document.getElementById('opt-result').innerHTML = '🌿 续养完成。Beany 进入 Stable 稳定期。<br><span style="color:var(--muted);font-size:0.55rem">性格永久锁定，行为保持不变。陪伴模式持续。</span>';
         clearInterval(clearId);
       }
     }, 250);
