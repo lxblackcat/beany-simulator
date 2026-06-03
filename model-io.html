@@ -1205,6 +1205,8 @@ function renderOutput() {
     + '<td style="padding:0.3rem 0.3rem;font-family:var(--font-mono);font-size:0.5rem;color:var(--text-secondary)">fun dailyUpdate(snapshot: PetGrowthSnapshot?, events: PetInteractionEventBatch, milestones: List&lt;UShort&gt;, stories: List&lt;UShort&gt;): DailyUpdateResult</td></tr>';
   
   html += '</table></div>';
+
+  document.getElementById('output-content').innerHTML = html;
 }
 
 // ===================== CONTENT ROUTING =====================
