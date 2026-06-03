@@ -1113,31 +1113,32 @@ function renderOutput() {
   const ns = SAMPLE.newSnapshot;
   let html = '';
 
+  // ========== WHAT WE DO: FILL WEIGHTS FOR ALL EVENTS ==========
   html += '<div style="margin-bottom:0.45rem;padding:0.4rem;background:var(--gold-glow);border:1px solid rgba(240,180,41,0.15);border-radius:var(--rad-sm)">';
-  html += '<div style="font-size:0.6rem;font-weight:600;margin-bottom:0.2rem">🧠 我们做的事：从舵机大表里选中合适的动作</div>';
-  html += '<div style="font-size:0.55rem;color:var(--text-muted)">硬件有 131 个预设动作（舵机方向+角度+时间）。我们从里面挑「符合当前性格」的写到查表。</div></div>';
+  html += '<div style="font-size:0.6rem;font-weight:600;margin-bottom:0.2rem">🧠 我们做的事：填每个事件的反应概率</div>';
+  html += '<div style="font-size:0.55rem;color:var(--text-muted)">所有事件在查表中都有行。五行的区别不是「有没有这个事件」，而是「同一个事件，不同五行反应概率不一样」。</div></div>';
 
-  html += '<div class="selection-flow">';
-  html += '<div class="sf-box">🎬 Beany 当前<br><span style="color:var(--gold)">木·青年·安心</span></div>';
-  html += '<span class="sf-arrow">→</span>';
-  html += '<div class="sf-box">📋 舵机大表<br><span style="color:var(--text-muted)">131 个动作 ID</span></div>';
-  html += '<span class="sf-arrow">→</span>';
-  html += '<div class="sf-box" style="background:var(--green-dim);border-color:rgba(52,211,153,0.2)">① 按 Stage 过滤<br><span style="color:var(--green)">留青年期动作</span></div>';
-  html += '<span class="sf-arrow">→</span>';
-  html += '<div class="sf-box" style="background:var(--green-dim);border-color:rgba(52,211,153,0.2)">② 按 Event 过滤<br><span style="color:var(--green)">留摸头顶动作</span></div>';
-  html += '<span class="sf-arrow">→</span>';
-  html += '<div class="sf-box" style="background:var(--gold-glow);border-color:rgba(240,180,41,0.3)">③ LLM 打分<br><span style="color:var(--gold)">选 2-3 候选+权重</span></div>';
-  html += '</div>';
-
+  // ========== COMPARISON TABLE ==========
   html += '<div style="margin-bottom:0.45rem;font-size:0.6rem;padding:0.4rem;background:rgba(255,255,255,0.015);border-radius:var(--rad-sm)">';
-  html += '<b style="color:var(--gold)">🎯 真实选中过程：</b>当前 Beany = 木属性·青年·安心<br>';
-  html += '舵机大表里「摸头顶」×「青年期」的动作有 3 个：<br>';
-  html += ' · 动作ID 1 → 抬头30°500ms → "蹭蹭，舒适"<br>';
-  html += ' · 动作ID 3 → 抬头30°300ms → "短促蠕动（害怕）"<br>';
-  html += ' · 动作ID 4 → 抬头30°220ms → "好奇张望"<br>';
-  html += 'LLM 判断 Beany 当前安心+信赖 → 排除害怕(❌)和好奇(❌)，选中 <span style="color:var(--gold)">动作ID 1（蹭蹭舒适）</span><br>';
-  html += '备选：加一个动作ID 2（抬头40°撒娇），置信度偏低 → weight=51 vs weight=204<br>';
-  html += '<span style="color:var(--text-muted)">选中结果 → 写入查表（action_id=1, weight=204; action_id=2, weight=51）</span></div>';
+  html += '<b style="color:var(--gold)">🎯 同一事件，不同五行 → 概率不同：</b><br>';
+  html += '<table style="width:100%;border-collapse:collapse;margin-top:0.3rem;font-size:0.55rem">';
+  html += '<tr><th style="text-align:left;color:var(--text-muted);padding:0.2rem 0.3rem;border-bottom:1px solid var(--border-subtle)">事件</th>';
+  html += '<th style="text-align:left;color:var(--text-muted);padding:0.2rem 0.3rem;border-bottom:1px solid var(--border-subtle)">🟢 木 Beany</th>';
+  html += '<th style="text-align:left;color:var(--text-muted);padding:0.2rem 0.3rem;border-bottom:1px solid var(--border-subtle)">🟡 金 Beany</th>';
+  html += '<th style="text-align:left;color:var(--text-muted);padding:0.2rem 0.3rem;border-bottom:1px solid var(--border-subtle)">🔵 水 Beany</th></tr>';
+  const compData = [
+    ['摸头顶','蹭蹭80% / 撒娇20%','张望30% / 蹭蹭70%','缩50% / 蹭蹭50%'],
+    ['摸肚子','摊开70% / 蹭手30%','摊开40% / 好奇60%','摊开90% / 缩10%'],
+    ['被拿起','张望90% / 缩10%','张望50% / 警觉50%','张望60% / 安心40%'],
+    ['平静语调','抬头100%','抬头80% / 警觉20%','抬头50% / 缩50%'],
+  ];
+  compData.forEach(r => {
+    html += '<tr><td style="padding:0.2rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.04)">' + r[0] + '</td>';
+    html += '<td style="padding:0.2rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--green)">' + r[1] + '</td>';
+    html += '<td style="padding:0.2rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--gold)">' + r[2] + '</td>';
+    html += '<td style="padding:0.2rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.04);color:#22d3ee">' + r[3] + '</td></tr>';
+  });
+  html += '</table><div style="margin-top:0.3rem;font-size:0.5rem;color:var(--text-muted)">查表覆盖 xlsx 全部 49 种事件。每种事件在不同五行下都有对应的动作和概率，只有 weight 值不同。<br>上表仅展示 4 种事件对比，完整表约 98 行（49 事件 × 2 候选/事件）。</div></div>';
 
   html += `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.15rem">PetGrowthSnapshot (11 字节)</div>
   <div class="byte-row">
@@ -1152,21 +1153,20 @@ function renderOutput() {
     <div class="byte hl">${ns.milestone}<span class="bl">milestone</span></div>
   </div>`;
 
-  html += '<div style="margin-top:0.4rem;font-size:0.62rem;font-weight:600">📋 写入硬件的查表</div>';
-  html += '<div style="font-size:0.55rem;color:var(--text-muted);margin-bottom:0.25rem">从 131 个动作里选中了 6 条，按性格给了权重。硬件拿到后直接用。</div>';
+  html += '<div style="margin-top:0.4rem;font-size:0.62rem;font-weight:600">📋 写入硬件的查表（木 Beany 示例，部分行）</div>';
+  html += '<div style="font-size:0.55rem;color:var(--text-muted);margin-bottom:0.25rem">完整的表覆盖 49 种事件 × 2 候选 = ~98 行。五行的区别只体现在 weight 上。</div>';
 
-  html += '<table class="mini-table"><tr><th>🤚 用户</th><th>😊 心情</th><th>🎬 选中动作</th><th>🔊</th><th>📳</th><th>🎲 概率</th><th>🧠 LLM 理由</th></tr>';
+  html += '<table class="mini-table"><tr><th>🤚 用户</th><th>😊 心情</th><th>🎬 动作</th><th>🔊</th><th>📳</th><th>🎲 木的 weight</th><th style="color:var(--gold)">🎲 金的 weight</th></tr>';
   const outData = [
-    ['摸头顶','ANY','抬头30°轻蹭','snd1','无','80%','木属性·安心 → 选舒适蹭蹭'],
-    ['摸头顶','ANY','抬头40°撒娇','snd2','无','20%','备选，低概率增加多样性'],
-    ['摸肚子','开心','低头30°摊开','snd19','震1','70%','开心+信赖 → 摊开享受'],
-    ['摸肚子','开心','左转60°蹭手','snd20','震1','30%','备选，活泼回应'],
-    ['被拿起','ANY','抬头90°张望','snd31','无','100%','唯一符合的动作'],
-    ['平静语调','ANY','抬头90°醒','snd31','无','100%','唯一符合的动作'],
+    ['摸头顶','ANY','抬头30°轻蹭','snd1','无','204 (80%)','77 (30%)'],
+    ['摸头顶','ANY','抬头60°好奇','snd2','无','51 (20%)','178 (70%)'],
+    ['摸肚子','开心','低头30°摊开','snd19','震1','178 (70%)','102 (40%)'],
+    ['摸肚子','开心','左转蹭手','snd20','震1','77 (30%)','153 (60%)'],
+    ['被拿起','ANY','抬头张望','snd31','无','230 (90%)','128 (50%)'],
+    ['平静语调','ANY','抬头醒','snd31','无','255 (100%)','204 (80%)'],
   ];
   outData.forEach((r, i) => {
-    const hl = r[5] === '100%' || r[5] === '80%' ? 'style="background:rgba(240,180,41,0.03)"' : '';
-    html += `<tr ${hl}><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td style="color:var(--gold);font-weight:600">${r[5]}</td><td style="font-size:0.5rem;color:var(--text-muted)">${r[6]}</td></tr>`;
+    html += `<tr><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td style="color:var(--green);font-weight:600">${r[5]}</td><td style="color:var(--gold);font-weight:600">${r[6]}</td></tr>`;
   });
   html += '</table>';
 
