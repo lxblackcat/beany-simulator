@@ -1207,7 +1207,7 @@ function renderOutput() {
   
   // Row: statefulness  
   html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);width:5rem">状态性</td>'
-    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)"><span style="color:var(--green)">马尔可夫链</span> — Day N 只依赖 Day N-1 的 PetGrowthSnapshot，不需要完整历史。模型内部没有额外状态树或推演路径。</td></tr>';
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)"><span style="color:var(--green)">有状态，状态全部在 PetGrowthSnapshot（11 字节）中</span><br>Day N 的权重/5-axis 更新只依赖 Day N-1 的 snapshot + 当天事件。不需要完整历史回放。没有隐藏的状态树或推演路径。</td></tr>';
   
   // Row: storage needed
   html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">需存档数据</td>'
