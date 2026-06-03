@@ -41,19 +41,46 @@ body {
 
 /* ============== MAIN: left-right split ============== */
 .main {
-  display:flex;
-  flex:1;
-  overflow:hidden;
-}
-.left-col {
-  flex:1;
-  overflow-y:auto;
+  max-width:1200px;
+  margin:0 auto;
   padding:1rem 1.5rem;
   display:flex;
   flex-direction:column;
   gap:1rem;
 }
+.top-bar {
+  display:flex;
+  gap:1rem;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.top-bar .snap-box {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:0.4rem 0.8rem;
+  font-size:0.6rem;
+  flex:1;
+  min-width:0;
+}
+.top-bar .info-box {
+  font-size:0.55rem;
+  color:var(--muted);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:0.4rem 0.8rem;
+  max-width:250px;
+}
 
+/* ============== Pipeline ============== */
+.pipe-row {
+  display:flex;
+  gap:0.5rem;
+  align-items:stretch;
+  overflow-x:auto;
+  padding-bottom:0.3rem;
+}
 .pipe-step {
   flex:1;
   min-width:200px;
@@ -215,42 +242,37 @@ body {
 
 <div class="main">
 
-<!-- ============== LEFT COLUMN ============== -->
-<div class="left-col">
+  <!-- Top bar: snapshot + description -->
+  <div class="top-bar">
+    <div class="snap-box">
+      📷 <span id="snap-info" style="color:var(--gold)">等待开始…</span>
+      · <span id="stage-info" style="color:var(--muted)">幼年→青年→成年→老年</span>
+    </div>
+    <div class="info-box" id="desc-box">点击「模拟一天」查看数据从设备到模型到设备回流</div>
+  </div>
 
   <!-- 5-step Pipeline -->
   <div class="pipe-row" id="pipeline">
-
-    <!-- Step 1 -->
     <div class="pipe-step">
       <div class="step-hd">📦 事件上报 <span class="dir">设备→App</span> <span class="badge badge-them">硬件有</span><span class="badge badge-us">我们读</span></div>
       <div class="step-body future" id="st1"><div id="c1"><div style="text-align:center;padding:0.5rem;color:var(--muted)">等待</div></div></div>
     </div>
-
-    <!-- Step 2 -->
     <div class="pipe-step">
       <div class="step-hd">📊 8 比例 <span class="dir">模型内</span> <span class="badge badge-us">我们兜</span></div>
       <div class="step-body future" id="st2"><div id="c2"><div style="text-align:center;padding:0.5rem;color:var(--muted)">等待</div></div></div>
     </div>
-
-    <!-- Step 3 -->
     <div class="pipe-step">
       <div class="step-hd">🗳️ 五行投票 <span class="dir">模型内</span> <span class="badge badge-us">我们兜</span></div>
       <div class="step-body future" id="st3"><div id="c3"><div style="text-align:center;padding:0.5rem;color:var(--muted)">等待</div></div></div>
     </div>
-
-    <!-- Step 4 -->
     <div class="pipe-step">
       <div class="step-hd">📈 5-axis <span class="dir">模型内</span> <span class="badge badge-us">我们兜</span></div>
       <div class="step-body future" id="st4"><div id="c4"><div style="text-align:center;padding:0.5rem;color:var(--muted)">等待</div></div></div>
     </div>
-
-    <!-- Step 5 -->
     <div class="pipe-step">
       <div class="step-hd">📋 新快照+查表 <span class="dir">App→设备</span> <span class="badge badge-us">快照</span><span class="badge badge-them">动作ID</span><span class="badge badge-together">情绪枚举</span></div>
       <div class="step-body future" id="st5"><div id="c5"><div style="text-align:center;padding:0.5rem;color:var(--muted)">等待</div></div></div>
     </div>
-
   </div>
 
   <!-- Controls -->
@@ -260,50 +282,29 @@ body {
     <div class="stat" id="stat-txt">就绪</div>
   </div>
 
-  <!-- ============== 30 天成长 ============== -->
+  <!-- 30 天成长 -->
   <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:0.5rem">
     <div class="section-title">📅 30 天养成周期 <span class="tag">模拟可实现 ✅</span></div>
-
-    <!-- Timeline -->
     <div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">点击日期查看该天状态 · 模拟 30 天后可选择结局</div>
     <div class="timeline" id="timeline"></div>
-
-    <!-- Day info -->
-    <div id="day-info" style="padding:0.5rem;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:0.6rem;margin-bottom:0.5rem">
-      点击上方日期查看每日数据
-    </div>
-
-    <!-- 3 options -->
+    <div id="day-info" style="padding:0.5rem;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:0.6rem;margin-bottom:0.5rem">点击上方日期查看每日数据</div>
     <div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">第 30 天结束时，选择 Beany 的结局：</div>
     <div class="option-card">
-
       <div class="opt" id="opt-rebirth" onclick="selectOpt('rebirth')">
         <h4>🔄 重生 <span class="badge badge-us" style="font-size:0.5rem">可实现</span></h4>
         <p>清除全部权重，从均匀值重新培育。所有历史数据擦除清空。</p>
-        <div class="effect">
-          weights → 金20 木20 水20 火20 土20<br>
-          revision → 0 · 全部历史 → <span class="del">删除</span>
-        </div>
+        <div class="effect">weights → 金20 木20 水20 火20 土20 · revision → 0 · <span class="del">删除</span></div>
       </div>
-
       <div class="opt" id="opt-continue" onclick="selectOpt('continue')">
         <h4>🌿 续养 <span class="badge badge-us" style="font-size:0.5rem">可实现</span></h4>
         <p>进入 Stable 稳定期，权重锁定不变。历史保留，后续不再产生新数据。</p>
-        <div class="effect">
-          stage → <span class="hl">Stable</span> · 权重 → <span class="hl">冻结</span><br>
-          查表 → 沿用 · 故事 → <span class="del">停止</span>
-        </div>
+        <div class="effect">stage → <span class="hl">Stable</span> · 权重 <span class="hl">冻结</span> · 查表沿用 · 故事<span class="del">停止</span></div>
       </div>
-
       <div class="opt" id="opt-reincarnate" onclick="selectOpt('reincarnate')">
         <h4>✨ 转世 <span class="badge badge-us" style="font-size:0.5rem">可实现</span></h4>
         <p>自选锁定到过去某天的模型状态。五行向量保留，阶段重置为幼年，生成全新查表。</p>
-        <div class="effect">
-          选 → Day 27 · 五行→<span class="hl">保留</span> · stage→<span class="hl">幼年</span><br>
-          查表 → <span class="hl">全新生成</span> · 里程碑/故事 → <span class="hl">保留</span>
-        </div>
+        <div class="effect">五行<span class="hl">保留</span> · stage→<span class="hl">幼年</span> · 查表<span class="hl">全新</span> · 里程碑/故事<span class="hl">保留</span></div>
       </div>
-
     </div>
     <div id="opt-result" style="margin-top:0.4rem;font-size:0.6rem;color:var(--muted);text-align:center">点击选项查看影响</div>
   </div>
@@ -314,14 +315,6 @@ body {
     <span><span class="badge badge-them" style="font-size:0.55rem;padding:0.1rem 0.4rem">🔴 硬件</span> action_id(131) · sound_id(32) · vibration_id(3)</span>
     <span><span class="badge badge-together" style="font-size:0.55rem;padding:0.1rem 0.4rem">🟡 一起定</span> emotion_state 枚举（xlsx已有，写进协议）</span>
   </div>
-</div>
-
-<!-- ============== STATUS BAR (compact, replaces right column) ============== -->
-<div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;padding:0.4rem 0.6rem;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:0.6rem">
-  <span>📷 <span id="snap-info" style="color:var(--gold)">等待开始…</span></span>
-  <span id="stage-info" style="color:var(--muted)">幼年→青年→成年→老年</span>
-  <span class="desc-box" id="desc-box" style="color:var(--muted);margin-left:auto;background:transparent;padding:0;font-size:0.55rem">点击「模拟一天」查看数据流</span>
-</div>
 
 </div>
 
@@ -400,11 +393,12 @@ function r5() {
 function renderSnap(st) {
   const s = st < 5 ? S.oldSnap : S.newSnap;
   const ns = S.newSnap;
-  let t = [s.metal,s.wood,s.water,s.fire,s.earth].map((v,i)=>['金','木','水','火','土'][i]+v).join(' ');
-  t += ' · '+s.stg+' rev='+s.rev;
-  if (st >= 5) t += ' → <span style="color:var(--gold)">金'+ns.metal+' 木'+ns.wood+' 水'+ns.water+' 火'+ns.fire+' 土'+ns.earth+'</span>';
-  if (st >= 5) t += ' · <span style="color:var(--gold)">🆕'+ns.ms+'</span>';
-  document.getElementById('snap-info').innerHTML = t;
+  let h = '<div class="info-row"><span class="il">金木水火土</span><span class="iv">'+[s.metal,s.wood,s.water,s.fire,s.earth].map((v,i)=>['金','木','水','火','土'][i]+v).join(' ')+'</span></div>';
+  h += '<div class="info-row"><span class="il">stage</span><span class="iv">'+s.stg+' (0x0'+s.stgV+')</span></div>';
+  h += '<div class="info-row"><span class="il">revision</span><span class="iv">'+s.rev+'</span></div>';
+  if (st >= 5) h += '<div class="info-row"><span class="il">⇢ 新</span><span class="iv" style="color:var(--gold)">金'+ns.metal+' 木'+ns.wood+' 水'+ns.water+' 火'+ns.fire+' 土'+ns.earth+'</span></div>';
+  if (st >= 5) h += '<div class="info-row"><span class="il">milestone</span><span class="iv" style="color:var(--gold)">'+ns.ms+' 🆕</span></div>';
+  snap_info.innerHTML = h;
 }
 
 function renderTimeline() {
