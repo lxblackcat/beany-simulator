@@ -98,6 +98,17 @@ body {
   padding:0.1rem 0.4rem;
   border-radius:4px;
 }
+.step-header .badge {
+  font-size:0.5rem;
+  padding:0.1rem 0.3rem;
+  border-radius:3px;
+  font-weight:600;
+  margin-left:0.2rem;
+}
+.badge-us { background:rgba(76,175,80,0.2); color:var(--green); border:1px solid rgba(76,175,80,0.3); }
+.badge-them { background:rgba(255,87,34,0.2); color:var(--orange); border:1px solid rgba(255,87,34,0.3); }
+.badge-together { background:rgba(255,193,7,0.2); color:var(--gold); border:1px solid rgba(255,193,7,0.3); }
+.badge-both { background:rgba(33,150,243,0.2); color:var(--blue); border:1px solid rgba(33,150,243,0.3); }
 .step-body {
   flex:1;
   padding:0.5rem;
@@ -294,7 +305,7 @@ body {
   <div class="pipeline" id="pipeline">
     <!-- Step 1: Events -->
     <div class="pipe-step">
-      <div class="step-header">📦 硬件事件上报 <span class="direction">设备→App</span></div>
+      <div class="step-header">📦 硬件事件上报 <span class="direction">设备→App</span> <span class="badge badge-them">硬件已有</span> <span class="badge badge-us">我们消费</span></div>
       <div class="step-body" id="step-1">
         <div id="events-content">
           <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待模拟一天…</div>
@@ -304,7 +315,7 @@ body {
 
     <!-- Step 2: Ratios -->
     <div class="pipe-step">
-      <div class="step-header">📊 计算 8 比例 <span class="direction">模型内部</span></div>
+      <div class="step-header">📊 计算 8 比例 <span class="direction">模型内部</span> <span class="badge badge-us">我们兜</span></div>
       <div class="step-body future" id="step-2">
         <div id="ratios-content">
           <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
@@ -314,7 +325,7 @@ body {
 
     <!-- Step 3: Vote -->
     <div class="pipe-step">
-      <div class="step-header">🗳️ 五行投票+调整 <span class="direction">模型内部</span></div>
+      <div class="step-header">🗳️ 五行投票+调整 <span class="direction">模型内部</span> <span class="badge badge-us">我们兜</span></div>
       <div class="step-body future" id="step-3">
         <div id="vote-content">
           <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
@@ -324,7 +335,7 @@ body {
 
     <!-- Step 4: 5-axis -->
     <div class="pipe-step">
-      <div class="step-header">📈 5-axis 更新 <span class="direction">模型内部</span></div>
+      <div class="step-header">📈 5-axis 更新 <span class="direction">模型内部</span> <span class="badge badge-us">我们兜</span></div>
       <div class="step-body future" id="step-4">
         <div id="axis-content">
           <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
@@ -334,7 +345,7 @@ body {
 
     <!-- Step 5: Output -->
     <div class="pipe-step">
-      <div class="step-header">📋 新快照+查表 <span class="direction">App→设备</span></div>
+      <div class="step-header">📋 新快照+查表 <span class="direction">App→设备</span> <span class="badge badge-us">快照我们兜</span> <span class="badge badge-them">动作ID需硬规定义</span> <span class="badge badge-together">情绪枚举一起定</span></div>
       <div class="step-body future" id="step-5">
         <div id="output-content">
           <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
@@ -619,5 +630,23 @@ function resetFlow() {
 // Boot
 updateUI(0);
 </script>
+
+<!-- ============ Legend ============ -->
+<div style="padding:1rem 2rem;background:var(--card);border-top:1px solid var(--border)">
+  <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:center">
+    <div><span class="badge badge-us" style="font-size:0.7rem;padding:0.2rem 0.6rem">🟢 我们兜</span></div>
+    <div style="font-size:0.65rem;color:var(--muted)">映射表 / 比例计算 / 投票引擎 / 5-axis / 快照序列化 / 查表编译器</div>
+  </div>
+  <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;margin-top:0.4rem">
+    <div><span class="badge badge-them" style="font-size:0.7rem;padding:0.2rem 0.6rem">🔴 硬件团队</span></div>
+    <div style="font-size:0.65rem;color:var(--muted)">action_id 动作编号（已定131个）· sound_id 音效（已定32个）· vibration_id 震动（已定3级）</div>
+  </div>
+  <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;margin-top:0.4rem">
+    <div><span class="badge badge-together" style="font-size:0.7rem;padding:0.2rem 0.6rem">🟡 一起定</span></div>
+    <div style="font-size:0.65rem;color:var(--muted)">emotion_state 枚举（xlsx已有值：1=开心 2=平静 3=悲伤，需写进协议）</div>
+  </div>
+  <div style="text-align:center;margin-top:0.6rem;font-size:0.6rem;color:var(--muted)">Beany Simulator · Model I/O Demo · v0.2</div>
+</div>
+
 </body>
 </html>
