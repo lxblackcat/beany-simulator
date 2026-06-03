@@ -1177,7 +1177,34 @@ function renderOutput() {
 
   html += '<div class="story-block">📖 story_id=0x0001 · App 本地存 · 不走 BLE · 设备不感知</div>';
 
-  document.getElementById('output-content').innerHTML = html;
+  // ========== MODEL API SPEC ==========
+  html += '<div style="margin-top:0.5rem;padding:0.5rem;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--rad-md)">';
+  html += '<div style="font-size:0.65rem;font-weight:600;margin-bottom:0.4rem;color:var(--gold)">📐 模型库接口定义（KMM 封装 · AAR / XCFramework）</div>';
+  
+  html += '<table style="width:100%;border-collapse:collapse;font-size:0.55rem">';
+  
+  // Row: statefulness  
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle);width:5rem">状态性</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)"><span style="color:var(--green)">马尔可夫链</span> — Day N 只依赖 Day N-1 的 PetGrowthSnapshot，不需要完整历史。模型内部没有额外状态树或推演路径。</td></tr>';
+  
+  // Row: storage needed
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">需存档数据</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">'
+    + 'PetGrowthSnapshot <span style="color:var(--gold)">11B</span> + 当前查表 <span style="color:var(--gold)">~700B</span> + 里程碑ID列表 <span style="color:var(--gold)">~100B</span> + 故事ID列表 <span style="color:var(--gold)">~100B</span> = <span style="color:var(--gold);font-weight:600">总计约 1KB</span>，可全部存入设备</td></tr>';
+  
+  // Row: input  
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">输入参数</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">currentSnapshot <span style="color:var(--text-muted)">·</span> todayEvents <span style="color:var(--text-muted)">·</span> unlockedMilestones: uint16[] <span style="color:var(--text-muted)">·</span> existingStoryIds: uint16[]</td></tr>';
+  
+  // Row: output
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">输出参数</td>'
+    + '<td style="padding:0.3rem 0.3rem;border-bottom:1px solid var(--border-subtle)">newSnapshot <span style="color:var(--text-muted)">·</span> newLookupTable <span style="color:var(--text-muted)">·</span> newMilestones <span style="color:var(--text-muted)">·</span> newStoryId</td></tr>';
+  
+  // Row: Kotlin method signature
+  html += '<tr><td style="color:var(--text-muted);padding:0.3rem 0.3rem">KMM 接口</td>'
+    + '<td style="padding:0.3rem 0.3rem;font-family:var(--font-mono);font-size:0.5rem;color:var(--text-secondary)">fun dailyUpdate(snapshot: PetGrowthSnapshot?, events: PetInteractionEventBatch, milestones: List&lt;UShort&gt;, stories: List&lt;UShort&gt;): DailyUpdateResult</td></tr>';
+  
+  html += '</table></div>';
 }
 
 // ===================== CONTENT ROUTING =====================
