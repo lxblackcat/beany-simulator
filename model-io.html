@@ -47,17 +47,15 @@ body {
 
 /* Main area */
 .main {
-  flex:1;
-  display:flex;
-  overflow:hidden;
+  max-width:1000px;
+  margin:0 auto;
+  padding:1rem 0;
 }
 
 /* ============ Pipeline ============ */
 .pipeline {
-  flex:1;
   display:flex;
   align-items:stretch;
-  padding:2rem;
   gap:0;
   overflow-x:auto;
 }
@@ -272,24 +270,7 @@ body {
 }
 
 /* ============ Right info panel ============ */
-.info-panel {
-  width:280px;
-  border-left:1px solid var(--border);
-  padding:1rem;
-  font-size:0.7rem;
-  overflow-y:auto;
-  background: var(--card);
-  display:flex;
-  flex-direction:column;
-  gap:0.6rem;
-}
-.info-panel h3 { font-size:0.75rem; margin-bottom:0.3rem; }
-.info-panel .info-row {
-  display:flex; gap:0.3rem; padding:0.2rem 0;
-  border-bottom:1px solid rgba(255,255,255,0.03);
-}
-.info-panel .info-row .il { color:var(--muted); min-width:5rem; }
-.info-panel .info-row .iv { font-family:monospace; }
+
 
 /* Timeline & Options */
 .timeline { display:flex; gap:3px; margin:0.5rem 0; overflow-x:auto; padding-bottom:0.2rem; }
@@ -312,6 +293,10 @@ body {
 
 <div class="main">
   <!-- ============ Pipeline ============ -->
+  <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:0.5rem;font-size:0.65rem;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:0.5rem 0.8rem">
+    <div>📷 <span id="snapshot-info" style="color:var(--gold)">等待开始</span></div>
+    <div style="color:var(--muted)" id="step-desc">点击「模拟一天」逐步查看</div>
+  </div>
   <div class="pipeline" id="pipeline">
     <!-- Step 1: Events -->
     <div class="pipe-step">
@@ -364,18 +349,7 @@ body {
     </div>
   </div>
 
-  <!-- ============ Right Panel ============ -->
-  <div class="info-panel">
-    <h3>📖 快照 (PetGrowthSnapshot)</h3>
-    <div id="snapshot-info">
-      <div style="color:var(--muted)">等待开始…</div>
-    </div>
-    <h3>ℹ️ 当前步骤说明</h3>
-    <div id="step-desc" style="color:var(--muted);font-size:0.65rem;line-height:1.5">
-      点击下方「模拟一天」开始演示数据流
-    </div>
   </div>
-</div>
 
 <!-- ============ Controls ============ -->
 <div class="controls">
