@@ -1438,8 +1438,8 @@ function selectOpt(id) {
         }
         const dots = '.'.repeat(frame);
         di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
-          + '<span style="color:var(--blue);font-weight:600">🔵 回到前世第二天继续' + dots + '</span><br>'
-          + '<span style="font-size:0.5rem;color:var(--text-muted)">放弃今生Day10 · 进入前世Day27→继续养到Day30</span></div>';
+          + '<span style="color:var(--blue);font-weight:600">🔵 回到前世选中那天继续' + dots + '</span><br>'
+          + '<span style="font-size:0.5rem;color:var(--text-muted)">放弃今生Day10 · 跳到前世选中那天→走到Day30</span></div>';
         document.getElementById('opt-result').textContent = '✨ 回到前世... Day 28, 29, 30 的故事继续上演';
       } else if (frame <= 7) {
         // Phase 2: animate Day 27→30 on the blue timeline
@@ -1469,7 +1469,7 @@ function selectOpt(id) {
           + '<span style="font-size:0.55rem">前世的故事，在这一刻圆满落幕。</span><br>'
           + '<span style="font-size:0.55rem">Beany 带着完整的记忆和成长，进入新的开始。</span></div>'
           + '<span style="font-size:0.5rem;color:var(--green)">✅ 前世 Day27→30 完成 · 可再次选择结局</span>';
-        document.getElementById('opt-result').innerHTML = '✨ 转世完成！回到前世 Day27 养到 Day30，前世故事圆满结局。<br><span style="color:var(--gold)">可选择续养（Stable）或再次重生开始全新轮回</span>';
+        document.getElementById('opt-result').innerHTML = '✨ 转世完成！回到前世选中那天养到 Day30，前世故事圆满结局。<br><span style="color:var(--gold)">可选择续养（Stable）或再次重生开始全新轮回</span>';
         clearInterval(clearId);
       }
     }, 400);
