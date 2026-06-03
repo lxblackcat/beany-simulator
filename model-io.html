@@ -1358,7 +1358,15 @@ function selectOpt(id) {
         document.getElementById('tl-1').className = 'tl-day active';
         rebirthDone = true;
         di.innerHTML = '<b>✅ 重生完成</b><br>权重: 金20 木20 水20 火20 土20 (均匀)<br>stage: 幼年 · revision: 0 · 全部历史已擦除';
-        document.getElementById('opt-result').innerHTML = '🔄 重生完成！从均匀权重（20%）重新培育。<br><span style="color:var(--gold)">✨ 转世选项已解锁！点击转世卡片体验。</span>'; 
+        document.getElementById('opt-result').innerHTML = '🔄 重生完成！从均匀权重（20%）重新培育。<br><span style="color:var(--gold)">⏳ 自动进入养成周期...</span>'; 
+        
+        // After 2s, fast-forward to Day 30 so user can choose ending
+        setTimeout(() => {
+          setTimelineClass('', 'done');
+          document.getElementById('tl-30').className = 'tl-day active';
+          di.innerHTML = '<b>📅 30 天养成完成</b><br>权重已演化为: 金80 木70 水60 火55 土50<br>stage: 青年 · 现在可以选择 Beany 的结局了';
+          document.getElementById('opt-result').innerHTML = '🔄 重生→30天养成完成！<br><span style="color:var(--gold)">✨ 点击「转世」或「续养」卡片选择结局。</span>';
+        }, 2000);
       }
     }, 150);
   }
