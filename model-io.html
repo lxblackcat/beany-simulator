@@ -3,398 +3,977 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐾 Beany Model — 交互式数据流演示</title>
+<title>Beany Model · 数据流仪表盘</title>
 <style>
+/* ==================== Reset & Base ==================== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
 :root {
-  --bg: #1a1a2e;
-  --card: #16213e;
-  --panel: #0f3460;
-  --border: #2a2a4a;
-  --text: #e8e8e8;
-  --muted: #666680;
-  --blue: #2196F3;
-  --green: #4CAF50;
-  --orange: #FF5722;
-  --gold: #FFC107;
-  --brown: #8D6E63;
+  --bg-deep:     #0c0e14;
+  --bg-surface:  #13161e;
+  --bg-card:     #181c28;
+  --bg-card-hi:  #1e2335;
+  --border-subtle: #232838;
+  --border-mid:    #2d3348;
+  --border-active: #3d7eff;
+  --text-primary:  #e4e7ef;
+  --text-secondary:#9098b0;
+  --text-muted:    #5a627a;
+  --gold:          #f0b429;
+  --gold-glow:     rgba(240,180,41,0.12);
+  --green:         #34d399;
+  --green-dim:     rgba(52,211,153,0.12);
+  --blue:          #3d7eff;
+  --blue-dim:      rgba(61,126,255,0.10);
+  --orange:        #f97316;
+  --orange-dim:    rgba(249,115,22,0.12);
+  --cyan:          #22d3ee;
+  --pink:          #e879f9;
+  --red:           #ef4444;
+  --rad-sm:  6px;
+  --rad-md: 10px;
+  --rad-lg: 14px;
+  --font: 'Inter','Segoe UI','PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
+  --font-mono: 'JetBrains Mono','SF Mono','Fira Code',monospace;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
+
 body {
-  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Header */
+/* Subtle background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(61,126,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61,126,255,0.012) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==================== Header ==================== */
 .header {
-  padding:1rem 2rem;
-  border-bottom:1px solid var(--border);
-  background: var(--card);
-  display:flex;
-  align-items:center;
-  gap:1rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 2rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
 }
-.header h1 { font-size:1.1rem; }
-.header .step-indicator {
-  margin-left:auto;
-  font-size:0.75rem;
-  color:var(--muted);
+.header-logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 700; color: #fff;
+  flex-shrink: 0;
 }
-.header .step-indicator span { color:var(--gold); font-weight:600; }
+.header h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.header-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: 0.25rem;
+}
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.step-counter {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.step-counter-num {
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.step-counter-total {
+  color: var(--text-muted);
+}
 
-/* Main area */
+/* ==================== Top Status Bar ==================== */
+.status-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 2rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  min-height: 2.5rem;
+}
+.status-snapshot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.status-snapshot-icon {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--blue-dim);
+  border: 1px solid rgba(61,126,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}
+.status-snapshot-text {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--gold);
+  line-height: 1.4;
+}
+.status-divider {
+  width: 1px;
+  height: 1.2rem;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+}
+.status-desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* ==================== Main Content ==================== */
 .main {
-  max-width:1000px;
-  margin:0 auto;
-  padding:1rem 0;
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  flex: 1;
 }
 
-/* ============ Pipeline ============ */
+/* ==================== Pipeline Section ==================== */
+.pipeline-section {
+  margin-bottom: 1rem;
+}
+.pipeline-section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pipeline-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
 .pipeline {
-  display:flex;
-  align-items:stretch;
-  gap:0;
-  overflow-x:auto;
-}
-.pipe-step {
-  flex:1;
-  min-width:260px;
-  display:flex;
-  flex-direction:column;
-  position:relative;
-}
-.pipe-step + .pipe-step::before {
-  content:'▶';
-  position:absolute;
-  left:-0.8rem;
-  top:50%;
-  transform:translateY(-50%);
-  color:var(--muted);
-  font-size:1.2rem;
-  z-index:1;
-}
-.step-header {
-  text-align:center;
-  padding:0.5rem;
-  font-size:0.75rem;
-  font-weight:600;
-  border-bottom:2px solid var(--border);
-  margin-bottom:0.5rem;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:0.4rem;
-}
-.step-header .direction {
-  font-size:0.6rem;
-  color:var(--muted);
-  font-weight:normal;
-  background:rgba(255,255,255,0.05);
-  padding:0.1rem 0.4rem;
-  border-radius:4px;
-}
-.step-header .badge {
-  font-size:0.5rem;
-  padding:0.1rem 0.3rem;
-  border-radius:3px;
-  font-weight:600;
-  margin-left:0.2rem;
-}
-.badge-us { background:rgba(76,175,80,0.2); color:var(--green); border:1px solid rgba(76,175,80,0.3); }
-.badge-them { background:rgba(255,87,34,0.2); color:var(--orange); border:1px solid rgba(255,87,34,0.3); }
-.badge-together { background:rgba(255,193,7,0.2); color:var(--gold); border:1px solid rgba(255,193,7,0.3); }
-.badge-both { background:rgba(33,150,243,0.2); color:var(--blue); border:1px solid rgba(33,150,243,0.3); }
-.step-body {
-  flex:1;
-  padding:0.5rem;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background: var(--card);
-  opacity:0.2;
-  transition: opacity 0.4s;
-}
-.step-body.active {
-  opacity:1;
-  border-color: var(--gold);
-  box-shadow:0 0 12px rgba(255,193,7,0.1);
-}
-.step-body.done {
-  opacity:0.8;
-  border-color: var(--green);
-}
-.step-body.future {
-  opacity:0.2;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  padding: 0.25rem 0;
 }
 
-/* ============ Event cards ============ */
-.event-item {
-  display:flex;
-  align-items:center;
-  gap:0.4rem;
-  padding:0.3rem 0.4rem;
-  font-size:0.7rem;
-  border-bottom:1px solid rgba(255,255,255,0.04);
+/* ==================== Pipeline Step ==================== */
+.pipe-step {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
-.event-item:last-child { border-bottom:none; }
+
+/* Arrow connector between steps */
+.pipe-step + .pipe-step::before {
+  content: '';
+  position: absolute;
+  left: -0.75rem;
+  top: 1.5rem;
+  width: 1.5rem;
+  height: 2px;
+  background: var(--border-mid);
+  z-index: 2;
+}
+.pipe-step + .pipe-step::after {
+  content: '';
+  position: absolute;
+  left: -0.85rem;
+  top: 1.35rem;
+  border: 5px solid transparent;
+  border-left-color: var(--border-mid);
+  z-index: 2;
+}
+
+/* Pipe connector legend */
+.pipe-step + .pipe-step .step-connector-lbl {
+  position: absolute;
+  left: -1.2rem;
+  top: 1.85rem;
+  font-size: 0.45rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* Step header card */
+.step-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--rad-md);
+  overflow: hidden;
+  transition: all 0.35s ease;
+  margin: 0 0.35rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.pipe-step.active .step-card {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-glow), 0 4px 20px rgba(0,0,0,0.4);
+}
+.pipe-step.done .step-card {
+  border-color: rgba(52,211,153,0.25);
+  background: var(--bg-card-hi);
+}
+.pipe-step.future .step-card {
+  opacity: 0.35;
+}
+
+/* Step header */
+.step-hdr {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(255,255,255,0.015);
+}
+.step-number {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.pipe-step.future .step-number { background: var(--border-subtle); color: var(--text-muted); }
+.pipe-step.active .step-number { background: var(--gold); color: #000; box-shadow: 0 0 8px var(--gold-glow); }
+.pipe-step.done .step-number { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+
+.step-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.step-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.step-dir {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+/* Step state indicator */
+.step-state {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6rem;
+  font-weight: 500;
+}
+.state-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+.pipe-step.future .step-state { color: var(--text-muted); }
+.pipe-step.future .state-dot { background: var(--border-mid); }
+.pipe-step.active .step-state { color: var(--gold); }
+.pipe-step.active .state-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); animation: pulse-dot 1.5s ease-in-out infinite; }
+.pipe-step.done .step-state { color: var(--green); }
+.pipe-step.done .state-dot { background: var(--green); }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Badges */
+.step-badge {
+  display: inline-block;
+  font-size: 0.5rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-right: 0.15rem;
+}
+.badge-us { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+.badge-them { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
+.badge-together { background: var(--gold-glow); color: var(--gold); border: 1px solid rgba(240,180,41,0.2); }
+.badge-both { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(61,126,255,0.2); }
+
+/* Step body (content area) */
+.step-body {
+  padding: 0.65rem 0.75rem;
+  flex: 1;
+  min-height: 180px;
+  transition: all 0.3s;
+}
+.step-body .placeholder-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+/* ==================== Internal Component Styles ==================== */
+/* -- Event items -- */
+.event-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.68rem;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.event-item:last-child { border-bottom: none; }
 .event-badge {
-  background: rgba(255,255,255,0.08);
-  border-radius:4px;
-  padding:0.05rem 0.3rem;
-  font-family:monospace;
-  font-size:0.6rem;
-  min-width:2rem;
-  text-align:center;
+  background: var(--bg-card-hi);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  min-width: 2rem;
+  text-align: center;
+  color: var(--cyan);
 }
 .event-count {
-  margin-left:auto;
+  margin-left: auto;
   background: var(--gold);
-  color:#000;
-  border-radius:8px;
-  padding:0 0.3rem;
-  font-size:0.6rem;
-  font-weight:600;
-  min-width:1.2rem;
-  text-align:center;
+  color: #000;
+  border-radius: 8px;
+  padding: 0 0.35rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 1.3rem;
+  text-align: center;
 }
 
-/* ============ Bytes ============ */
+/* -- Byte rows -- */
 .byte-row {
-  display:flex;
-  gap:2px;
-  flex-wrap:wrap;
-  margin:0.4rem 0;
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  margin: 0.35rem 0;
 }
 .byte {
-  background:rgba(255,255,255,0.06);
-  border:1px solid var(--border);
-  border-radius:3px;
-  padding:0.15rem 0.3rem;
-  font-family:monospace;
-  font-size:0.6rem;
-  text-align:center;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.15rem 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  text-align: center;
+  color: var(--text-secondary);
 }
-.byte .bl { display:block; font-size:0.5rem; color:var(--muted); }
-.byte.hl { border-color:var(--gold); background:rgba(255,193,7,0.12); }
+.byte .bl { display: block; font-size: 0.45rem; color: var(--text-muted); margin-top: 1px; }
+.byte.hl { border-color: var(--gold); background: var(--gold-glow); color: var(--gold); }
+.byte.hl .bl { color: rgba(240,180,41,0.6); }
 
-/* ============ Ratio bars ============ */
+/* -- Ratio bars -- */
 .ratio-line {
-  display:flex;
-  align-items:center;
-  gap:0.4rem;
-  padding:0.15rem 0;
-  font-size:0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
+  font-size: 0.62rem;
 }
-.ratio-line .rl { width:6rem; color:var(--muted); }
+.ratio-line .rl { width: 6.5rem; color: var(--text-secondary); font-size: 0.6rem; }
 .ratio-line .rt {
-  flex:1; height:5px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden;
+  flex: 1; height: 4px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 2px;
+  overflow: hidden;
 }
-.ratio-line .rf { height:100%; border-radius:2px; transition:width 0.5s; }
-.ratio-line .rv { width:2.2rem; text-align:right; font-family:monospace; font-size:0.6rem; }
+.ratio-line .rf { height: 100%; border-radius: 2px; transition: width 0.6s; }
+.ratio-line .rv {
+  width: 2.6rem;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+}
 
-/* ============ Vote ============ */
+/* -- Vote -- */
 .vote-line {
-  display:flex;
-  align-items:center;
-  gap:0.4rem;
-  padding:0.2rem 0;
-  font-size:0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
+  font-size: 0.62rem;
 }
 .vote-dot {
-  width:1.2rem; height:1.2rem;
-  border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:0.6rem; color:#fff; font-weight:600;
+  width: 1.15rem; height: 1.15rem;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; color: #fff; font-weight: 700;
+  flex-shrink: 0;
 }
 .vote-track {
-  flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;
+  flex: 1; height: 5px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 3px; overflow: hidden;
 }
-.vote-fill { height:100%; border-radius:3px; transition:width 0.5s; }
-.vote-num { width:3rem; font-family:monospace; font-size:0.6rem; color:var(--muted); }
+.vote-fill { height: 100%; border-radius: 3px; transition: width 0.6s; }
+.vote-num { width: 3rem; font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-secondary); }
+.vote-wt { font-family: var(--font-mono); font-size: 0.6rem; min-width: 3.8rem; color: var(--text-secondary); }
 
-/* ============ Axis ============ */
+/* -- Axis -- */
 .axis-line {
-  display:flex; align-items:center; gap:0.3rem; padding:0.15rem 0; font-size:0.65rem;
+  display: flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0; font-size: 0.62rem;
 }
-.axis-line .al { width:3rem; color:var(--muted); }
-.axis-line .an { font-family:monospace; }
-.axis-line .ad { font-size:0.55rem; color:var(--muted); }
-.axis-line .up { color:var(--green); }
-.axis-line .down { color:var(--orange); }
+.axis-line .al { width: 3rem; font-size: 0.6rem; }
+.axis-line .an { font-family: var(--font-mono); font-size: 0.6rem; }
+.axis-line .ad { font-size: 0.52rem; color: var(--text-muted); }
+.axis-line .up { color: var(--green); }
+.axis-line .down { color: var(--orange); }
 
-/* ============ Table ============ */
+/* -- Mini table -- */
 .mini-table {
-  width:100%; border-collapse:collapse; font-size:0.6rem; margin-top:0.3rem;
+  width: 100%; border-collapse: collapse; font-size: 0.6rem; margin-top: 0.25rem;
 }
 .mini-table th {
-  text-align:left; color:var(--muted); padding:0.2rem 0.3rem;
-  border-bottom:1px solid var(--border); font-weight:500;
+  text-align: left; color: var(--text-muted); padding: 0.2rem 0.35rem;
+  border-bottom: 1px solid var(--border-subtle); font-weight: 500; font-size: 0.55rem;
 }
 .mini-table td {
-  padding:0.2rem 0.3rem; border-bottom:1px solid rgba(255,255,255,0.04);
-  font-family:monospace;
+  padding: 0.2rem 0.35rem;
+  border-bottom: 1px solid rgba(255,255,255,0.025);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
 }
 
-/* ============ Controls ============ */
+/* -- Selection flow row -- */
+.selection-flow {
+  display: flex; gap: 0.2rem; margin-bottom: 0.5rem; font-size: 0.55rem; align-items: center;
+}
+.selection-flow .sf-box {
+  flex: 1; padding: 0.3rem; background: rgba(255,255,255,0.02);
+  border-radius: 5px; text-align: center; border: 1px solid var(--border-subtle);
+  line-height: 1.4;
+}
+.selection-flow .sf-arrow {
+  flex-shrink: 0; color: var(--text-muted); font-size: 0.65rem; padding: 0 0.15rem;
+}
+
+/* ==================== Controls Bar ==================== */
 .controls {
-  padding:1rem 2rem;
-  border-top:1px solid var(--border);
-  background: var(--card);
-  display:flex;
-  align-items:center;
-  gap:1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--rad-md);
+  margin-bottom: 1.25rem;
 }
 .controls button {
-  background: rgba(255,193,7,0.15);
-  border:1px solid var(--gold);
+  height: 2.2rem;
+  padding: 0 1.25rem;
+  border-radius: var(--rad-sm);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.btn-primary {
+  background: linear-gradient(135deg, rgba(240,180,41,0.15), rgba(240,180,41,0.08));
+  border: 1px solid rgba(240,180,41,0.4);
   color: var(--gold);
-  padding:0.5rem 1.5rem;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:0.8rem;
-  transition:all 0.2s;
 }
-.controls button:hover { background:rgba(255,193,7,0.25); }
-.controls button:disabled { opacity:0.3; cursor:not-allowed; }
-.controls button.reset {
-  background:transparent;
-  border-color:var(--border);
-  color:var(--muted);
+.btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, rgba(240,180,41,0.25), rgba(240,180,41,0.15)); }
+.btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  color: var(--text-secondary);
 }
-.controls .status {
-  margin-left:auto;
-  font-size:0.7rem;
-  color:var(--muted);
+.btn-secondary:hover { background: rgba(255,255,255,0.03); border-color: var(--border-active); color: var(--text-primary); }
+.controls-status {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.controls-status .status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+.controls-status .status-dot.idle { background: var(--border-mid); }
+.controls-status .status-dot.busy { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); animation: pulse-dot 1.5s ease-in-out infinite; }
+.controls-status .status-dot.done { background: var(--green); }
+
+/* ==================== Timeline ==================== */
+.timeline-section {
+  margin-bottom: 1.25rem;
+}
+.timeline-hdr {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.timeline-hdr h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.timeline-hdr .tl-badge {
+  font-size: 0.55rem;
+  padding: 0.1rem 0.45rem;
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(52,211,153,0.2);
+  border-radius: 3px;
+  font-weight: 500;
+}
+.timeline-hdr .tl-hint {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+.timeline {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+.tl-day {
+  flex: 0 0 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.tl-day.done {
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(52,211,153,0.2);
+}
+.tl-day.active {
+  background: var(--gold-glow);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  box-shadow: 0 0 6px var(--gold-glow);
+}
+.tl-day.future {
+  background: rgba(255,255,255,0.02);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+.tl-day.end {
+  background: var(--orange-dim);
+  color: var(--orange);
+  border: 1px solid rgba(249,115,22,0.25);
+}
+.tl-day:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-/* ============ Right info panel ============ */
+.day-info-panel {
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--rad-sm);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-family: var(--font-mono);
+}
 
+/* ==================== Options Section ==================== */
+.options-section {
+  margin-bottom: 1rem;
+}
+.options-hdr {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+.options-grid {
+  display: flex;
+  gap: 1rem;
+}
+.opt {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--rad-md);
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.opt:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-glow);
+  background: var(--bg-card-hi);
+}
+.opt h4 {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.opt p {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.35rem;
+}
+.opt-detail {
+  padding: 0.3rem 0.4rem;
+  background: rgba(255,255,255,0.015);
+  border-radius: 4px;
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  font-family: var(--font-mono);
+}
+.opt-result {
+  margin-top: 0.4rem;
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 0.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--rad-sm);
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-/* Timeline & Options */
-.timeline { display:flex; gap:3px; margin:0.5rem 0; overflow-x:auto; padding-bottom:0.2rem; }
-.tl-day { flex:0 0 28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:0.45rem; border-radius:3px; cursor:pointer; }
-.tl-day.done { background:rgba(76,175,80,0.2); color:var(--green); border:1px solid rgba(76,175,80,0.3); }
-.tl-day.active { background:rgba(255,193,7,0.2); color:var(--gold); border:1px solid var(--gold); }
-.tl-day.future { background:rgba(255,255,255,0.04); color:var(--muted); border:1px solid var(--border); }
-.tl-day.end { background:rgba(255,87,34,0.15); color:var(--orange); border:1px solid rgba(255,87,34,0.3); }
-.opt:hover { border-color:var(--gold) !important; }
+/* ==================== Legend ==================== */
+.legend {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 0.5rem;
+}
+.legend-item {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.legend-badge {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.5rem;
+  font-weight: 600;
+}
 
+/* ==================== Story Block ==================== */
+.story-block {
+  margin-top: 0.35rem;
+  padding: 0.4rem;
+  background: rgba(255,255,255,0.015);
+  border-radius: 6px;
+  font-size: 0.6rem;
+  color: var(--gold);
+  border: 1px solid rgba(240,180,41,0.1);
+  line-height: 1.5;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 900px) {
+  .pipeline { flex-direction: column; align-items: stretch; }
+  .pipe-step { min-width: auto; }
+  .pipe-step + .pipe-step::before,
+  .pipe-step + .pipe-step::after,
+  .pipe-step + .pipe-step .step-connector-lbl { display: none; }
+  .pipe-step + .pipe-step { margin-top: 0.5rem; }
+  .options-grid { flex-direction: column; }
+  .header { padding: 0.6rem 1rem; }
+  .status-bar { padding: 0.5rem 1rem; flex-wrap: wrap; }
+  .status-divider { display: none; }
+  .main { padding: 1rem 0.75rem; }
+  .selection-flow { flex-wrap: wrap; }
+  .selection-flow .sf-box { min-width: 8rem; flex: 0 1 auto; }
+}
 </style>
 </head>
 <body>
 
+<!-- ==================== HEADER ==================== -->
 <div class="header">
-  <h1>🐾 Beany Model 数据流</h1>
-  <div style="font-size:0.7rem;color:var(--muted)">交互式演示 · 点「模拟一天」逐步查看</div>
-  <div class="step-indicator">步骤 <span id="step-num">0</span> / <span id="step-total">5</span></div>
+  <div class="header-logo">B</div>
+  <h1>Beany Model <span class="header-sub">数据流仪表盘</span></h1>
+  <div class="header-right">
+    <div class="step-counter">
+      <span class="step-counter-num" id="step-num">0</span>
+      <span>/</span>
+      <span class="step-counter-total" id="step-total">5</span>
+      <span style="color:var(--text-muted);margin-left:0.2rem">步骤</span>
+    </div>
+  </div>
 </div>
 
+<!-- ==================== STATUS BAR ==================== -->
+<div class="status-bar">
+  <div class="status-snapshot">
+    <div class="status-snapshot-icon">📷</div>
+    <div class="status-snapshot-text" id="snapshot-info">等待开始</div>
+  </div>
+  <div class="status-divider"></div>
+  <div class="status-desc" id="step-desc">点击「模拟一天」逐步查看数据流</div>
+</div>
+
+<!-- ==================== MAIN ==================== -->
 <div class="main">
-  <!-- ============ Pipeline ============ -->
-  <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:0.5rem;font-size:0.65rem;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:0.5rem 0.8rem">
-    <div>📷 <span id="snapshot-info" style="color:var(--gold)">等待开始</span></div>
-    <div style="color:var(--muted)" id="step-desc">点击「模拟一天」逐步查看</div>
+
+  <!-- Pipeline -->
+  <div class="pipeline-section">
+    <div class="pipeline-section-title">数据处理管道</div>
+    <div class="pipeline" id="pipeline">
+
+      <!-- Step 1: Events -->
+      <div class="pipe-step">
+        <div class="step-card" id="step-card-1">
+          <div class="step-hdr">
+            <div class="step-number">1</div>
+            <div class="step-title-wrap">
+              <div class="step-title">事件上报</div>
+              <div class="step-dir">
+                <span class="step-badge badge-them">硬件</span>
+                <span class="step-badge badge-us">我们消费</span>
+                设备→App
+              </div>
+            </div>
+            <div class="step-state">
+              <span class="state-dot"></span>
+              <span class="state-label" id="state-lbl-1">等待</span>
+            </div>
+          </div>
+          <div class="step-body" id="step-1">
+            <div class="placeholder-msg">等待模拟一天…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Ratios -->
+      <div class="pipe-step">
+        <div class="step-card" id="step-card-2">
+          <div class="step-hdr">
+            <div class="step-number">2</div>
+            <div class="step-title-wrap">
+              <div class="step-title">8 比例计算</div>
+              <div class="step-dir">
+                <span class="step-badge badge-us">我们兜</span>
+                模型内部
+              </div>
+            </div>
+            <div class="step-state">
+              <span class="state-dot"></span>
+              <span class="state-label" id="state-lbl-2">等待</span>
+            </div>
+          </div>
+          <div class="step-body" id="step-2">
+            <div class="placeholder-msg">等待上一步…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Vote -->
+      <div class="pipe-step">
+        <div class="step-card" id="step-card-3">
+          <div class="step-hdr">
+            <div class="step-number">3</div>
+            <div class="step-title-wrap">
+              <div class="step-title">五行投票</div>
+              <div class="step-dir">
+                <span class="step-badge badge-us">我们兜</span>
+                模型内部
+              </div>
+            </div>
+            <div class="step-state">
+              <span class="state-dot"></span>
+              <span class="state-label" id="state-lbl-3">等待</span>
+            </div>
+          </div>
+          <div class="step-body" id="step-3">
+            <div class="placeholder-msg">等待上一步…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: 5-axis -->
+      <div class="pipe-step">
+        <div class="step-card" id="step-card-4">
+          <div class="step-hdr">
+            <div class="step-number">4</div>
+            <div class="step-title-wrap">
+              <div class="step-title">5-axis 更新</div>
+              <div class="step-dir">
+                <span class="step-badge badge-us">我们兜</span>
+                模型内部
+              </div>
+            </div>
+            <div class="step-state">
+              <span class="state-dot"></span>
+              <span class="state-label" id="state-lbl-4">等待</span>
+            </div>
+          </div>
+          <div class="step-body" id="step-4">
+            <div class="placeholder-msg">等待上一步…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Output -->
+      <div class="pipe-step">
+        <div class="step-card" id="step-card-5">
+          <div class="step-hdr">
+            <div class="step-number">5</div>
+            <div class="step-title-wrap">
+              <div class="step-title">快照 + 查表</div>
+              <div class="step-dir">
+                <span class="step-badge badge-us">快照</span>
+                <span class="step-badge badge-them">动作 ID</span>
+                <span class="step-badge badge-together">情绪枚举</span>
+                App→设备
+              </div>
+            </div>
+            <div class="step-state">
+              <span class="state-dot"></span>
+              <span class="state-label" id="state-lbl-5">等待</span>
+            </div>
+          </div>
+          <div class="step-body" id="step-5">
+            <div class="placeholder-msg">等待上一步…</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-  <div class="pipeline" id="pipeline">
-    <!-- Step 1: Events -->
-    <div class="pipe-step">
-      <div class="step-header">📦 硬件事件上报 <span class="direction">设备→App</span> <span class="badge badge-them">硬件已有</span> <span class="badge badge-us">我们消费</span></div>
-      <div class="step-body" id="step-1">
-        <div id="events-content">
-          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待模拟一天…</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Step 2: Ratios -->
-    <div class="pipe-step">
-      <div class="step-header">📊 计算 8 比例 <span class="direction">模型内部</span> <span class="badge badge-us">我们兜</span></div>
-      <div class="step-body future" id="step-2">
-        <div id="ratios-content">
-          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3: Vote -->
-    <div class="pipe-step">
-      <div class="step-header">🗳️ 五行投票+调整 <span class="direction">模型内部</span> <span class="badge badge-us">我们兜</span></div>
-      <div class="step-body future" id="step-3">
-        <div id="vote-content">
-          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 4: 5-axis -->
-    <div class="pipe-step">
-      <div class="step-header">📈 5-axis 更新 <span class="direction">模型内部</span> <span class="badge badge-us">我们兜</span></div>
-      <div class="step-body future" id="step-4">
-        <div id="axis-content">
-          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 5: Output -->
-    <div class="pipe-step">
-      <div class="step-header">📋 新快照+查表 <span class="direction">App→设备</span> <span class="badge badge-us">快照我们兜</span> <span class="badge badge-them">动作ID需硬规定义</span> <span class="badge badge-together">情绪枚举一起定</span></div>
-      <div class="step-body future" id="step-5">
-        <div id="output-content">
-          <div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>
-        </div>
-      </div>
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn-secondary" onclick="resetFlow()">⟲ 重置</button>
+    <button class="btn-primary" id="btn-next" onclick="nextStep()">▶ 模拟一天</button>
+    <div class="controls-status">
+      <span class="status-dot idle" id="ctrl-dot"></span>
+      <span id="status-text">就绪</span>
     </div>
   </div>
 
+  <!-- Timeline -->
+  <div class="timeline-section">
+    <div class="timeline-hdr">
+      <h3>📅 30 天养成周期</h3>
+      <span class="tl-badge">模拟可实现</span>
+      <span class="tl-hint">点击日期查看每日状态 · 30天后选择结局</span>
+    </div>
+    <div class="timeline" id="timeline"></div>
+    <div class="day-info-panel" id="day-info">点击上方日期查看每日数据</div>
   </div>
 
-<!-- ============ Controls ============ -->
-<div class="controls">
-  <button class="reset" onclick="resetFlow()">⟲ 重置</button>
-  <button id="btn-next" onclick="nextStep()">▶ 模拟一天</button>
-  <div class="status" id="status-text">就绪</div>
-</div>
-
-<!-- ============== 30 天成长 ============== -->
-<div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:1rem;max-width:1000px;margin-left:auto;margin-right:auto">
-  <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem">📅 30 天养成周期 <span style="font-size:0.55rem;background:var(--border);color:var(--muted);padding:0.1rem 0.4rem;border-radius:3px">模拟可实现 ✅</span></div>
-  <div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">点击日期查看该天状态 · 模拟 30 天后可选择结局</div>
-  <div class="timeline" id="timeline"></div>
-  <div id="day-info" style="padding:0.5rem;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:0.6rem;margin-bottom:0.5rem">点击上方日期查看每日数据</div>
-
-  <div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">第 30 天结束时，选择 Beany 的结局：</div>
-  <div style="display:flex;gap:1rem">
-    <div class="opt" id="opt-rebirth" onclick="selectOpt('rebirth')" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.8rem;cursor:pointer">
-      <h4 style="font-size:0.75rem;margin-bottom:0.3rem">🔄 重生</h4>
-      <p style="font-size:0.6rem;color:var(--muted);line-height:1.5">清除全部权重，从均匀值重新培育。所有历史数据擦除清空。</p>
-      <div style="margin-top:0.3rem;padding:0.3rem;background:rgba(255,255,255,0.03);border-radius:4px;font-size:0.55rem;color:var(--muted)">weights → 金20 木20 水20 火20 土20 · revision → 0 · 历史<span style="color:var(--orange)">删除</span></div>
+  <!-- Options -->
+  <div class="options-section">
+    <div class="options-hdr">第 30 天结束时，选择 Beany 的结局：</div>
+    <div class="options-grid">
+      <div class="opt" id="opt-rebirth" onclick="selectOpt('rebirth')">
+        <h4>🔄 重生</h4>
+        <p>清除全部权重，从均匀值重新培育。所有历史数据擦除清空。</p>
+        <div class="opt-detail">weights → 金20 木20 水20 火20 土20 · revision → 0 · 历史<span style="color:var(--orange)">删除</span></div>
+      </div>
+      <div class="opt" id="opt-continue" onclick="selectOpt('continue')">
+        <h4>🌿 续养</h4>
+        <p>进入 Stable 稳定期，权重锁定不变。历史保留，后续不再产生新数据。</p>
+        <div class="opt-detail">stage → <span style="color:var(--gold)">Stable</span> · 权重 <span style="color:var(--gold)">冻结</span> · 查表沿用 · 故事<span style="color:var(--orange)">停止</span></div>
+      </div>
+      <div class="opt" id="opt-reincarnate" onclick="selectOpt('reincarnate')">
+        <h4>✨ 转世</h4>
+        <p>自选锁定到过去某天的模型状态。五行向量保留，阶段重置为幼年，生成全新查表。</p>
+        <div class="opt-detail">五行<span style="color:var(--gold)">保留</span> · stage→<span style="color:var(--gold)">幼年</span> · 查表<span style="color:var(--gold)">全新</span> · 里程碑/故事<span style="color:var(--gold)">保留</span></div>
+      </div>
     </div>
-    <div class="opt" id="opt-continue" onclick="selectOpt('continue')" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.8rem;cursor:pointer">
-      <h4 style="font-size:0.75rem;margin-bottom:0.3rem">🌿 续养</h4>
-      <p style="font-size:0.6rem;color:var(--muted);line-height:1.5">进入 Stable 稳定期，权重锁定不变。历史保留，后续不再产生新数据。</p>
-      <div style="margin-top:0.3rem;padding:0.3rem;background:rgba(255,255,255,0.03);border-radius:4px;font-size:0.55rem;color:var(--muted)">stage → <span style="color:var(--gold)">Stable</span> · 权重 <span style="color:var(--gold)">冻结</span> · 查表沿用 · 故事<span style="color:var(--orange)">停止</span></div>
+    <div class="opt-result" id="opt-result">点击选项查看影响</div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <span class="legend-badge" style="background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,0.2)">🟢 我们兜</span>
+      映射表 / 比例计算 / 投票引擎 / 5-axis / 快照序列化 / 查表编译器
     </div>
-    <div class="opt" id="opt-reincarnate" onclick="selectOpt('reincarnate')" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.8rem;cursor:pointer">
-      <h4 style="font-size:0.75rem;margin-bottom:0.3rem">✨ 转世</h4>
-      <p style="font-size:0.6rem;color:var(--muted);line-height:1.5">自选锁定到过去某天的模型状态。五行向量保留，阶段重置为幼年，生成全新查表。</p>
-      <div style="margin-top:0.3rem;padding:0.3rem;background:rgba(255,255,255,0.03);border-radius:4px;font-size:0.55rem;color:var(--muted)">五行<span style="color:var(--gold)">保留</span> · stage→<span style="color:var(--gold)">幼年</span> · 查表<span style="color:var(--gold)">全新</span> · 里程碑/故事<span style="color:var(--gold)">保留</span></div>
+    <div class="legend-item">
+      <span class="legend-badge" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(249,115,22,0.2)">🔴 硬件</span>
+      action_id(131) · sound_id(32) · vibration_id(3)
+    </div>
+    <div class="legend-item">
+      <span class="legend-badge" style="background:var(--gold-glow);color:var(--gold);border:1px solid rgba(240,180,41,0.2)">🟡 一起定</span>
+      emotion_state 枚举（xlsx已有，写进协议）
     </div>
   </div>
-  <div id="opt-result" style="margin-top:0.4rem;font-size:0.6rem;color:var(--muted);text-align:center">点击选项查看影响</div>
-</div>
 
-<!-- ============== Legend ============== -->
-<div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;font-size:0.6rem;color:var(--muted);padding:0.5rem 0">
-  <span><span style="font-size:0.55rem;padding:0.1rem 0.4rem;background:rgba(76,175,80,0.2);color:var(--green);border:1px solid rgba(76,175,80,0.3);border-radius:2px">🟢 我们兜</span> 映射表 / 比例计算 / 投票引擎 / 5-axis / 快照序列化 / 查表编译器</span>
-  <span><span style="font-size:0.55rem;padding:0.1rem 0.4rem;background:rgba(255,87,34,0.2);color:var(--orange);border:1px solid rgba(255,87,34,0.3);border-radius:2px">🔴 硬件</span> action_id(131) · sound_id(32) · vibration_id(3)</span>
-  <span><span style="font-size:0.55rem;padding:0.1rem 0.4rem;background:rgba(255,193,7,0.2);color:var(--gold);border:1px solid rgba(255,193,7,0.3);border-radius:2px">🟡 一起定</span> emotion_state 枚举（xlsx已有，写进协议）</span>
 </div>
 
 <script>
-// ===================== DATA =====================
+// ===================== DATA (unchanged) =====================
 const SAMPLE = {
   events: [
     { id:1, name:'摸头顶', count:3, emotion:'开心', time:'18:22', loc:'headtop' },
@@ -441,19 +1020,20 @@ const ELEM_COLORS = { 金:'#FFC107', 木:'#4CAF50', 水:'#2196F3', 火:'#FF5722'
 let step = 0;
 const TOTAL = 5;
 
-// ===================== RENDER =====================
+const LABELS = ['等待','处理中','完成'];
+
+// ===================== RENDER (mostly unchanged logic) =====================
 function renderEvents() {
-  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">设备一天上报 ${SAMPLE.events.length} 条（已合并）</div>`;
+  let html = `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.35rem">设备一天上报 ${SAMPLE.events.length} 条（已合并）</div>`;
   SAMPLE.events.forEach(e => {
     html += `<div class="event-item">
       <span class="event-badge">0x${e.id.toString(16).padStart(2,'0')}</span>
       <span>${e.name}</span>
-      <span style="color:var(--muted);font-size:0.6rem">${e.emotion}</span>
+      <span style="color:var(--text-muted);font-size:0.6rem">${e.emotion}</span>
       <span class="event-count">×${e.count}</span>
     </div>`;
   });
-  // raw bytes
-  html += `<div style="margin-top:0.3rem;font-size:0.55rem;color:var(--muted)">
+  html += `<div style="margin-top:0.35rem;font-size:0.52rem;color:var(--text-muted)">
     <div>原始字节（批次头 + 7条 PetInteractionEvent × 9B）:</div>
     <div class="byte-row">
       <div class="byte hl">EA<span class="bl">schema</span></div>
@@ -477,7 +1057,7 @@ function renderRatios() {
     ['novelty_seeking', r.novelty_seeking, '#FFC107'],
     ['response_timing', r.response_timing, '#2196F3'],
   ];
-  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">每条比例 vs 0.5 阈值决定投票方向</div>`;
+  let html = `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.35rem">每条比例 vs 0.5 阈值决定投票方向</div>`;
   items.forEach(([name, val, color]) => {
     const pct = Math.round(val*100);
     html += `<div class="ratio-line">
@@ -492,17 +1072,17 @@ function renderRatios() {
 function renderVote() {
   const w = SAMPLE.oldWeights;
   const maxVotes = Math.max(...Object.values(SAMPLE.votes));
-  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">最高票+5% · 最低票−5% · 相生+1%</div>`;
+  let html = `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.35rem">最高票+5% · 最低票−5% · 相生+1%</div>`;
   Object.entries(SAMPLE.votes).forEach(([elem, votes]) => {
     const vpct = (votes / maxVotes) * 100;
     html += `<div class="vote-line">
       <div class="vote-dot" style="background:${ELEM_COLORS[elem]}">${elem}</div>
       <div class="vote-track"><div class="vote-fill" style="width:${vpct}%;background:${ELEM_COLORS[elem]}"></div></div>
       <span class="vote-num">${votes} 票</span>
-      <span style="font-family:monospace;font-size:0.6rem;min-width:3.5rem">权重 ${w[elem]}%</span>
+      <span class="vote-wt">权重 ${w[elem]}%</span>
     </div>`;
   });
-  html += `<div style="margin-top:0.3rem;font-size:0.6rem;color:var(--muted)">
+  html += `<div style="margin-top:0.35rem;font-size:0.6rem;color:var(--text-muted)">
     木最高票(+5%) → 水最低票(−5%) → 木生火(+1%)<br>
     <span style="color:var(--gold)">新权重: 金24% 木28% 水13% 火19% 土16%</span>
   </div>`;
@@ -515,7 +1095,7 @@ function renderAxis() {
   const delta = SAMPLE.axisDelta;
   const axisCN = { attachment:'依恋', trust:'信任', stability:'稳定', energy:'能量', curiosity:'好奇' };
   const axisColors = { attachment:'#2196F3', trust:'#8D6E63', stability:'#4CAF50', energy:'#FF5722', curiosity:'#FFC107' };
-  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">element_changes_today × 映射矩阵</div>`;
+  let html = `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.35rem">element_changes_today × 映射矩阵</div>`;
   Object.keys(axisCN).forEach(key => {
     const d = delta[key];
     const cls = d >= 0 ? 'up' : 'down';
@@ -532,27 +1112,24 @@ function renderAxis() {
 function renderOutput() {
   const ns = SAMPLE.newSnapshot;
   let html = '';
-  
-  // ========== OUR FLOW (NOT hardware's) ==========
-  html += '<div style="margin-bottom:0.5rem;padding:0.4rem;background:rgba(255,193,7,0.04);border:1px solid rgba(255,193,7,0.15);border-radius:6px">';
-  html += '<div style="font-size:0.6rem;font-weight:600;margin-bottom:0.3rem">🧠 我们做的事：从舵机大表里选中合适的动作</div>';
-  html += '<div style="font-size:0.55rem;color:var(--muted)">硬件有 131 个预设动作（舵机方向+角度+时间）。我们从里面挑「符合当前性格」的写到查表。</div></div>';
 
-  // ========== SELECTION FLOW ==========
-  html += '<div style="display:flex;gap:0.3rem;margin-bottom:0.5rem;font-size:0.55rem">';
-  html += '<div style="flex:1;padding:0.3rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">🎬 Beany 当前<br><span style="color:var(--gold)">木·青年·安心</span></div>';
-  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
-  html += '<div style="flex:1;padding:0.3rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">📋 舵机大表<br><span style="color:var(--muted)">131 个动作 ID</span></div>';
-  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
-  html += '<div style="flex:1;padding:0.3rem;background:rgba(76,175,80,0.08);border:1px solid var(--green);border-radius:4px;text-align:center">① 按 Stage 过滤<br><span style="color:var(--green)">留青年期动作</span></div>';
-  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
-  html += '<div style="flex:1;padding:0.3rem;background:rgba(76,175,80,0.08);border:1px solid var(--green);border-radius:4px;text-align:center">② 按 Event 过滤<br><span style="color:var(--green)">留摸头顶动作</span></div>';
-  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
-  html += '<div style="flex:1;padding:0.3rem;background:rgba(255,193,7,0.1);border:1px solid var(--gold);border-radius:4px;text-align:center">③ LLM 打分<br><span style="color:var(--gold)">选 2-3 候选+权重</span></div>';
+  html += '<div style="margin-bottom:0.45rem;padding:0.4rem;background:var(--gold-glow);border:1px solid rgba(240,180,41,0.15);border-radius:var(--rad-sm)">';
+  html += '<div style="font-size:0.6rem;font-weight:600;margin-bottom:0.2rem">🧠 我们做的事：从舵机大表里选中合适的动作</div>';
+  html += '<div style="font-size:0.55rem;color:var(--text-muted)">硬件有 131 个预设动作（舵机方向+角度+时间）。我们从里面挑「符合当前性格」的写到查表。</div></div>';
+
+  html += '<div class="selection-flow">';
+  html += '<div class="sf-box">🎬 Beany 当前<br><span style="color:var(--gold)">木·青年·安心</span></div>';
+  html += '<span class="sf-arrow">→</span>';
+  html += '<div class="sf-box">📋 舵机大表<br><span style="color:var(--text-muted)">131 个动作 ID</span></div>';
+  html += '<span class="sf-arrow">→</span>';
+  html += '<div class="sf-box" style="background:var(--green-dim);border-color:rgba(52,211,153,0.2)">① 按 Stage 过滤<br><span style="color:var(--green)">留青年期动作</span></div>';
+  html += '<span class="sf-arrow">→</span>';
+  html += '<div class="sf-box" style="background:var(--green-dim);border-color:rgba(52,211,153,0.2)">② 按 Event 过滤<br><span style="color:var(--green)">留摸头顶动作</span></div>';
+  html += '<span class="sf-arrow">→</span>';
+  html += '<div class="sf-box" style="background:var(--gold-glow);border-color:rgba(240,180,41,0.3)">③ LLM 打分<br><span style="color:var(--gold)">选 2-3 候选+权重</span></div>';
   html += '</div>';
 
-  // ========== REAL EXAMPLE ==========
-  html += '<div style="margin-bottom:0.5rem;font-size:0.6rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px">';
+  html += '<div style="margin-bottom:0.45rem;font-size:0.6rem;padding:0.4rem;background:rgba(255,255,255,0.015);border-radius:var(--rad-sm)">';
   html += '<b style="color:var(--gold)">🎯 真实选中过程：</b>当前 Beany = 木属性·青年·安心<br>';
   html += '舵机大表里「摸头顶」×「青年期」的动作有 3 个：<br>';
   html += ' · 动作ID 1 → 抬头30°500ms → "蹭蹭，舒适"<br>';
@@ -560,12 +1137,10 @@ function renderOutput() {
   html += ' · 动作ID 4 → 抬头30°220ms → "好奇张望"<br>';
   html += 'LLM 判断 Beany 当前安心+信赖 → 排除害怕(❌)和好奇(❌)，选中 <span style="color:var(--gold)">动作ID 1（蹭蹭舒适）</span><br>';
   html += '备选：加一个动作ID 2（抬头40°撒娇），置信度偏低 → weight=51 vs weight=204<br>';
-  html += '<span style="color:var(--muted)">选中结果 → 写入查表（action_id=1, weight=204; action_id=2, weight=51）</span></div>';
+  html += '<span style="color:var(--text-muted)">选中结果 → 写入查表（action_id=1, weight=204; action_id=2, weight=51）</span></div>';
 
-  // ========== BYTES ==========
-  html += `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.2rem">PetGrowthSnapshot (11 字节)</div>
+  html += `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.15rem">PetGrowthSnapshot (11 字节)</div>
   <div class="byte-row">
-    <div class="byte hl">0xEA<span class="bl">schema</span></div>
     <div class="byte hl">${ns.metal.toString(16).padStart(2,'0')}<span class="bl">金↑</span></div>
     <div class="byte hl">${ns.wood.toString(16).padStart(2,'0')}<span class="bl">木→</span></div>
     <div class="byte hl">${ns.water.toString(16).padStart(2,'0')}<span class="bl">水↓</span></div>
@@ -577,11 +1152,10 @@ function renderOutput() {
     <div class="byte hl">${ns.milestone}<span class="bl">milestone</span></div>
   </div>`;
 
-  // ========== OUTPUT ==========
-  html += '<div style="margin-top:0.5rem;font-size:0.6rem;font-weight:600">📋 我们写进硬件的查表</div>';
-  html += '<div style="font-size:0.55rem;color:var(--muted);margin-bottom:0.3rem">从 131 个动作里选中了 6 条，按性格给了权重。硬件拿到后直接用。</div>';
-  
-  html += '<table class="mini-table"><tr><th>🤚 用户</th><th>😊 心情</th><th>🎬 选中动作</th><th>🔊</th><th>📳</th><th>🎲 概率</th><th>🧠 LLM 为什么这么选</th></tr>';
+  html += '<div style="margin-top:0.4rem;font-size:0.62rem;font-weight:600">📋 写入硬件的查表</div>';
+  html += '<div style="font-size:0.55rem;color:var(--text-muted);margin-bottom:0.25rem">从 131 个动作里选中了 6 条，按性格给了权重。硬件拿到后直接用。</div>';
+
+  html += '<table class="mini-table"><tr><th>🤚 用户</th><th>😊 心情</th><th>🎬 选中动作</th><th>🔊</th><th>📳</th><th>🎲 概率</th><th>🧠 LLM 理由</th></tr>';
   const outData = [
     ['摸头顶','ANY','抬头30°轻蹭','snd1','无','80%','木属性·安心 → 选舒适蹭蹭'],
     ['摸头顶','ANY','抬头40°撒娇','snd2','无','20%','备选，低概率增加多样性'],
@@ -591,15 +1165,25 @@ function renderOutput() {
     ['平静语调','ANY','抬头90°醒','snd31','无','100%','唯一符合的动作'],
   ];
   outData.forEach((r, i) => {
-    const hl = r[5] === '100%' || r[5] === '80%' ? 'style="background:rgba(255,193,7,0.04)"' : '';
-    html += `<tr ${hl}><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td style="color:var(--gold);font-weight:600">${r[5]}</td><td style="font-size:0.5rem;color:var(--muted)">${r[6]}</td></tr>`;
+    const hl = r[5] === '100%' || r[5] === '80%' ? 'style="background:rgba(240,180,41,0.03)"' : '';
+    html += `<tr ${hl}><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td style="color:var(--gold);font-weight:600">${r[5]}</td><td style="font-size:0.5rem;color:var(--text-muted)">${r[6]}</td></tr>`;
   });
   html += '</table>';
-  
-  // ========== STORY ==========
-  html += '<div style="margin-top:0.4rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px;font-size:0.6rem;color:var(--gold)">📖 story_id=0x0001 · App 本地存 · 不走 BLE · 设备不感知</div>';
+
+  html += '<div class="story-block">📖 story_id=0x0001 · App 本地存 · 不走 BLE · 设备不感知</div>';
 
   document.getElementById('output-content').innerHTML = html;
+}
+
+// ===================== CONTENT ROUTING =====================
+function renderContentForStep() {
+  switch(step) {
+    case 1: renderEvents(); break;
+    case 2: renderRatios(); break;
+    case 3: renderVote(); break;
+    case 4: renderAxis(); break;
+    case 5: renderOutput(); break;
+  }
 }
 
 function renderSnapshotInfo(step) {
@@ -607,60 +1191,67 @@ function renderSnapshotInfo(step) {
   const ns = SAMPLE.newSnapshot;
   let html = '';
   if (step === 0) {
-    html = `<div style="color:var(--muted)">等待开始…</div>`;
+    html = `<span style="color:var(--text-muted)">等待开始…</span>`;
   } else if (step < 5) {
-    // Show current (old)
-    html = `<div class="info-row"><span class="il">wu_xing</span><span class="iv">金${s.metal} 木${s.wood} 水${s.water} 火${s.fire} 土${s.earth}</span></div>
-    <div class="info-row"><span class="il">stage</span><span class="iv">${s.stage} (0x0${s.stageVal})</span></div>
-    <div class="info-row"><span class="il">revision</span><span class="iv">${s.revision}</span></div>`;
+    html = `金${s.metal} 木${s.wood} 水${s.water} 火${s.fire} 土${s.earth} · ${s.stage} rev${s.revision}`;
   } else {
-    // Show new
-    html = `<div class="info-row"><span class="il">wu_xing</span><span class="iv" style="color:var(--gold)">金${ns.metal} 木${ns.wood} 水${ns.water} 火${ns.fire} 土${ns.earth}</span></div>
-    <div class="info-row"><span class="il">stage</span><span class="iv">${ns.stage} (0x0${ns.stageVal})</span></div>
-    <div class="info-row"><span class="il">revision</span><span class="iv">${ns.revision} ← ${s.revision}</span></div>
-    <div class="info-row"><span class="il">milestone</span><span class="iv">${ns.milestone} 🆕</span></div>`;
+    html = `<span style="color:var(--gold)">金${ns.metal} 木${ns.wood} 水${ns.water} 火${ns.fire} 土${ns.earth}</span> · ${ns.stage} rev${ns.revision} 🆕`;
   }
   document.getElementById('snapshot-info').innerHTML = html;
 }
 
 const STEP_DESCS = [
-  '', // step 0
+  '',
   '设备通过 BLE 上报一天内的交互事件。每条 9 字节包含 event_id、时间戳、次数、情绪、情境。模拟里这些事件从文本场景解析，硬件里来自真实传感器。',
   '模型把原始事件聚合成 8 个比例值（0-1），每个比例描述一天行为的一个维度——触摸多不多、声音互动几次、有没有换花样。',
   '每个比例跟 0.5 比，高了给某些元素投票，低了给另一些。得票最高的元素权重 +5%，最低的 -5%，相生关系再加 +1%。总和永远 100%。',
   '五行权重变化 × 映射矩阵 = 5-axis (依恋/信任/稳定/能量/好奇) 的变化量。这是 Beany 性格状态的实际更新。',
   '写入新快照（11 字节）+ 输出查表。我们做的：从硬件舵机动作大表（131个ID）中，按 Beany 当前性格选中 1-3 个候选 + 打分归一化 → 写入查表的 random_weight。',
-  '' // completed
+  ''
 ];
 
 function updateUI(nextStepIdx) {
   for (let i = 1; i <= TOTAL; i++) {
-    const el = document.getElementById('step-' + i);
-    if (!el) continue;
-    el.classList.remove('active','done','future');
-    if (i < nextStepIdx) el.classList.add('done');
-    else if (i === nextStepIdx) el.classList.add('active');
-    else el.classList.add('future');
+    const card = document.getElementById('step-card-' + i);
+    const parent = card ? card.parentElement : null;
+    if (!parent) continue;
+    parent.classList.remove('active','done','future');
+    if (i < nextStepIdx) parent.classList.add('done');
+    else if (i === nextStepIdx) parent.classList.add('active');
+    else parent.classList.add('future');
+
+    const lbl = document.getElementById('state-lbl-' + i);
+    if (lbl) {
+      if (i < nextStepIdx) lbl.textContent = '完成';
+      else if (i === nextStepIdx) lbl.textContent = '处理中';
+      else lbl.textContent = '等待';
+    }
   }
+
   document.getElementById('step-num').textContent = nextStepIdx > TOTAL ? TOTAL : Math.min(nextStepIdx, TOTAL);
-  document.getElementById('step-total').textContent = TOTAL;
 
   if (nextStepIdx >= 1 && nextStepIdx <= TOTAL) {
     document.getElementById('step-desc').innerHTML = STEP_DESCS[nextStepIdx];
   }
 
+  const dot = document.getElementById('ctrl-dot');
+  const text = document.getElementById('status-text');
+
   if (nextStepIdx > TOTAL) {
-    document.getElementById('status-text').textContent = '✅ 一天模拟完成';
+    text.textContent = '✅ 一天模拟完成';
     document.getElementById('btn-next').disabled = true;
-    document.getElementById('btn-next').textContent = '✓ 完成';
+    document.getElementById('btn-next').innerHTML = '✓ 完成';
+    dot.className = 'status-dot done';
   } else if (nextStepIdx === 0) {
-    document.getElementById('status-text').textContent = '就绪';
+    text.textContent = '就绪';
     document.getElementById('btn-next').disabled = false;
-    document.getElementById('btn-next').textContent = '▶ 模拟一天';
+    document.getElementById('btn-next').innerHTML = '▶ 模拟一天';
+    dot.className = 'status-dot idle';
   } else {
-    document.getElementById('status-text').textContent = `步骤 ${nextStepIdx}/${TOTAL}`;
+    text.textContent = `步骤 ${nextStepIdx}/${TOTAL}`;
     document.getElementById('btn-next').disabled = false;
-    document.getElementById('btn-next').textContent = '▶ 下一步';
+    document.getElementById('btn-next').innerHTML = '▶ 下一步';
+    dot.className = 'status-dot busy';
   }
 
   renderSnapshotInfo(nextStepIdx);
@@ -668,21 +1259,17 @@ function updateUI(nextStepIdx) {
 
 function nextStep() {
   step++;
-  if (step === 1) renderEvents();
-  if (step === 2) renderRatios();
-  if (step === 3) renderVote();
-  if (step === 4) renderAxis();
-  if (step === 5) renderOutput();
+  renderContentForStep();
   updateUI(step);
 }
 
 function resetFlow() {
   step = 0;
-  document.getElementById('events-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待模拟一天…</div>';
-  document.getElementById('ratios-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
-  document.getElementById('vote-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
-  document.getElementById('axis-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
-  document.getElementById('output-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.65rem">等待上一步…</div>';
+  document.getElementById('events-content').innerHTML = '<div class="placeholder-msg">等待模拟一天…</div>';
+  document.getElementById('ratios-content').innerHTML = '<div class="placeholder-msg">等待上一步…</div>';
+  document.getElementById('vote-content').innerHTML = '<div class="placeholder-msg">等待上一步…</div>';
+  document.getElementById('axis-content').innerHTML = '<div class="placeholder-msg">等待上一步…</div>';
+  document.getElementById('output-content').innerHTML = '<div class="placeholder-msg">等待上一步…</div>';
   updateUI(0);
 }
 
@@ -704,8 +1291,8 @@ function showDay(d) {
   const maxIdx = w.indexOf(Math.max(...w));
   const elemNames = ['金','木','水','火','土'];
   const elemColors = ['#FFC107','#4CAF50','#2196F3','#FF5722','#8D6E63'];
-  document.getElementById('day-info').innerHTML = 
-    '<b>Day ' + d + '</b> · ' + stg + '期<br>wu_xing: ' + 
+  document.getElementById('day-info').innerHTML =
+    '<b>Day ' + d + '</b> · ' + stg + '期<br>wu_xing: ' +
     '金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] +
     '<br>revision: ' + d + ' · stage_grow_value: ' + Math.round(d/30*255) +
     '<br>主导: <span style="color:' + elemColors[maxIdx] + '">' + elemNames[maxIdx] + '</span>';
