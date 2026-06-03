@@ -557,8 +557,27 @@ function renderAxis() {
 
 function renderOutput() {
   const ns = SAMPLE.newSnapshot;
-  // Snapshot bytes
-  let html = `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem">PetGrowthSnapshot (11 字节)</div>
+  let html = '';
+  
+  // ========== FLOW EXPLANATION ==========
+  html += '<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;font-size:0.6rem">';
+  html += '<div style="flex:1;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">📦 事件发生<br><span style="color:var(--muted)">设备检测到事件</span></div>';
+  html += '<div style="display:flex;align-items:center;color:var(--muted)">▶</div>';
+  html += '<div style="flex:1;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">🗳️ 查表匹配<br><span style="color:var(--muted)">过滤 event_id+emo+ctx</span></div>';
+  html += '<div style="display:flex;align-items:center;color:var(--muted)">▶</div>';
+  html += '<div style="flex:1;padding:0.4rem;background:rgba(255,193,7,0.1);border:1px solid var(--gold);border-radius:4px;text-align:center">🎲 加权随机<br><span style="color:var(--gold)">按 weight 选一行</span></div>';
+  html += '<div style="display:flex;align-items:center;color:var(--muted)">▶</div>';
+  html += '<div style="flex:1;padding:0.4rem;background:rgba(76,175,80,0.1);border:1px solid var(--green);border-radius:4px;text-align:center">🤖 执行动作<br><span style="color:var(--green)">舵机+声音+震动</span></div>';
+  html += '</div>';
+
+  // ========== EXAMPLE ==========
+  html += '<div style="padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:0.5rem;font-size:0.6rem">';
+  html += '<b>示例：</b>用户<span style="color:var(--gold)">摸头顶</span> → event_id=0x01 · 设备当前情绪=开心 · context=0x00<br>';
+  html += '查表匹配：event_id=0x01 的行 + emotion=ANY(全都匹配) → <span style="color:var(--green)">命中 2 行</span><br>';
+  html += '加权随机：0.8 概率选 <span style="color:var(--gold)">抬头30°</span> · 0.2 概率选 <span style="color:var(--gold)">抬头60°</span></div>';
+
+  // ========== BYTES ==========
+  html += `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.2rem">PetGrowthSnapshot (11 字节)</div>
   <div class="byte-row">
     <div class="byte hl">0xEA<span class="bl">schema</span></div>
     <div class="byte hl">${ns.metal.toString(16).padStart(2,'0')}<span class="bl">金↑</span></div>
@@ -572,18 +591,36 @@ function renderOutput() {
     <div class="byte hl">${ns.milestone}<span class="bl">milestone</span></div>
   </div>`;
 
-  // Table
-  html += `<div style="margin-top:0.5rem;font-size:0.6rem;color:var(--muted);margin-bottom:0.2rem">PetBehaviorLookupTable (6 行 · revision=3)</div>
-  <table class="mini-table">
-    <tr><th>事件</th><th>情绪</th><th>动作ID</th><th>声音</th><th>震</th><th>权重</th></tr>`;
-  SAMPLE.lookupTable.forEach(row => {
-    html += `<tr><td>${row.ev}</td><td>${row.emo}</td><td>${row.actionId}</td><td>${row.sound}</td><td>${row.vib}</td><td>${row.w.toFixed(1)}</td></tr>`;
+  // ========== LOOKUP TABLE ==========
+  html += `<div style="margin-top:0.5rem;margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem">`;
+  html += `<span style="font-size:0.6rem;font-weight:600">📋 PetBehaviorLookupTable</span>`;
+  html += `<span style="font-size:0.5rem;color:var(--muted)">revision=3 · ${SAMPLE.lookupTable.length} 行 · 每行 7 字节</span>`;
+  html += `</div>`;
+  
+  // Row 1: header + byte values
+  html += '<table class="mini-table"><tr><th>匹配条件</th><th colspan="3">执行指令</th><th>权重</th><th>字节</th></tr>';
+  html += '<tr><th style="font-size:0.5rem">事件·情绪·上下文</th><th>动作ID</th><th>声音</th><th>震动</th><th>0-255</th><th style="font-size:0.5rem">7B hex</th></tr>';
+  SAMPLE.lookupTable.forEach((row, idx) => {
+    const actionHex = parseInt(row.actionId, 16);
+    const soundHex = parseInt(row.sound, 16);
+    const weightHex = Math.round(row.w * 255);
+    // input_event_id, applies_emotion, applies_context, action_id, sound_id, vibration_id, random_weight
+    const evId = SAMPLE.events.find(e => e.name === row.ev)?.id || 1;
+    const bytes = [evId, 0, 0, actionHex, soundHex, row.vib, weightHex].map(b => b.toString(16).padStart(2,'0')).join(' ');
+    const highlight = row.w >= 0.8 ? 'style="background:rgba(255,193,7,0.06)"' : '';
+    html += `<tr ${highlight}><td>${row.ev} · ${row.emo} · ANY</td><td>${row.actionId}</td><td>${row.sound}</td><td>${row.vib}</td><td>${weightHex}</td><td style="font-size:0.5rem;font-family:monospace">${bytes}</td></tr>`;
   });
-  html += `</table>`;
-
-  // Story
-  html += `<div style="margin-top:0.4rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px;font-size:0.6rem;color:var(--gold)">
-    📖 story_id=0x0001 · App 本地存 · 不走 BLE</div>`;
+  html += '</table>';
+  
+  // ========== weighted random explanation ==========
+  html += '<div style="margin-top:0.3rem;padding:0.3rem 0.4rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:4px;font-size:0.55rem">';
+  html += '<b>🎲 加权随机逻辑：</b>当设备检测到事件时，查表找出所有匹配的行。<br>';
+  html += '多行匹配时按 <span style="color:var(--gold)">random_weight</span> 比例随机选一行执行。权重全 0 = 均匀随机。<br>';
+  html += '例：摸头顶命中 2 行 (weight=204 和 weight=51)，硬件 80% 概率选抬头30°，20% 选抬头60°。';  
+  html += '</div>';
+  
+  // ========== STORY ==========
+  html += '<div style="margin-top:0.4rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px;font-size:0.6rem;color:var(--gold)">📖 story_id=0x0001 · App 本地存 · 不走 BLE · 设备不感知</div>';
 
   document.getElementById('output-content').innerHTML = html;
 }
