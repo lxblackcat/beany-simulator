@@ -1039,12 +1039,20 @@ function renderEvents() {
     </div>`;
   });
   html += `<div style="margin-top:0.35rem;font-size:0.52rem;color:var(--text-muted)">
-    <div>原始字节（批次头 + 7条 PetInteractionEvent × 9B）:</div>
+    <div>原始字节（批次头 + 7条 PetInteractionEvent × 9B/条）:</div>
     <div class="byte-row">
+      <span style="font-size:0.5rem;color:var(--text-muted);display:flex;gap:1px">批次头: </span>
       <div class="byte hl">EA<span class="bl">schema</span></div>
-      <div class="byte hl">00 07<span class="bl">count=7</span></div>
-      <div class="byte">01 67 1F 3B 80 03 01 00 00</div>
-      <div class="byte">0A 67 1F 3B 88 01 02 00 00</div>
+      <div class="byte hl" style="border-color:var(--gold)">00 07<span class="bl">event_count</span></div>
+    </div>
+    <div class="byte-row" style="margin-top:0.15rem">
+      <span style="font-size:0.5rem;color:var(--text-muted);display:flex;gap:1px">第1条事件(9B): </span>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">01<span class="bl" style="color:var(--gold)">event_id</span></div>
+      <div class="byte">67 1F 3B 80<span class="bl">timestamp</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">03<span class="bl" style="color:var(--gold)">occurrence</span></div>
+      <div class="byte">01<span class="bl">emotion</span></div>
+      <div class="byte">00<span class="bl">context</span></div>
+      <div class="byte">00<span class="bl">attach_len</span></div>
     </div>
   </div>`;
   document.getElementById('events-content').innerHTML = html;
@@ -1145,21 +1153,35 @@ function renderOutput() {
   });
   html += '</table><div style="margin-top:0.3rem;font-size:0.5rem;color:var(--text-muted)">查表覆盖 xlsx 全部 49 种事件。每种事件在不同五行下都有对应的动作和概率，只有 weight 值不同。<br>上表仅展示 4 种事件对比，完整表约 98 行（49 事件 × 2 候选/事件）。</div></div>';
 
-  html += `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.15rem">PetGrowthSnapshot (11 字节)</div>
+  html += `<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.15rem">PetGrowthSnapshot 协议结构（11 字节）</div>
   <div class="byte-row">
-    <div class="byte hl">${ns.metal.toString(16).padStart(2,'0')}<span class="bl">金↑</span></div>
-    <div class="byte hl">${ns.wood.toString(16).padStart(2,'0')}<span class="bl">木→</span></div>
-    <div class="byte hl">${ns.water.toString(16).padStart(2,'0')}<span class="bl">水↓</span></div>
-    <div class="byte hl">${ns.fire.toString(16).padStart(2,'0')}<span class="bl">火↑</span></div>
-    <div class="byte hl">${ns.earth.toString(16).padStart(2,'0')}<span class="bl">土↓</span></div>
-    <div class="byte hl">0x0${ns.stageVal}<span class="bl">${ns.stage}</span></div>
-    <div class="byte hl">${ns.growValue.toString(16).padStart(2,'0')}<span class="bl">进度</span></div>
-    <div class="byte hl">0x0${ns.revision}<span class="bl">rev</span></div>
-    <div class="byte hl">${ns.milestone}<span class="bl">milestone</span></div>
-  </div>`;
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">EA<span class="bl" style="color:var(--gold)">schema</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.metal.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[0]金属</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.wood.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[1]木</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.water.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[2]水</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.fire.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[3]火</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.earth.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">wu_xing[4]土</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">0x0${ns.stageVal}<span class="bl" style="color:var(--gold)">stage</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.growValue.toString(16).padStart(2,'0')}<span class="bl" style="color:var(--gold)">stage_grow</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">0x0${ns.revision}<span class="bl" style="color:var(--gold)">state_rev</span></div>
+      <div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06)">${ns.milestone}<span class="bl" style="color:var(--gold)">milestone</span></div>
+  </div>
+  <div style="font-size:0.45rem;color:var(--text-muted);margin-top:0.1rem">协议字段：schema(1B) · wu_xing[5](5B) · stage(1B) · stage_grow_value(1B) · state_revision(1B) · milestone(2B)</div>`;
 
   html += '<div style="margin-top:0.4rem;font-size:0.62rem;font-weight:600">📋 写入硬件的查表（木 Beany 示例，部分行）</div>';
   html += '<div style="font-size:0.55rem;color:var(--text-muted);margin-bottom:0.25rem">完整的表覆盖 49 种事件 × 2 候选 = ~98 行。五行的区别只体现在 weight 上。</div>';
+  
+  // Show BehaviorLookupItem 7-byte structure
+  html += '<div style="display:flex;gap:2px;margin-bottom:0.35rem;font-size:0.5rem">'
+    + '<span style="color:var(--text-muted);white-space:nowrap;line-height:1.8">每行 7 字节: </span>'
+    + '<div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06);padding:0.05rem 0.25rem">event_id<span class="bl" style="color:var(--gold);font-size:0.45rem">input</span></div>'
+    + '<div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06);padding:0.05rem 0.25rem">emotion<span class="bl" style="color:var(--gold);font-size:0.45rem">applies</span></div>'
+    + '<div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06);padding:0.05rem 0.25rem">context<span class="bl" style="color:var(--gold);font-size:0.45rem">applies</span></div>'
+    + '<div class="byte" style="background:rgba(52,211,153,0.1);border-color:var(--green);padding:0.05rem 0.25rem">action_id<span class="bl" style="color:var(--green);font-size:0.45rem">执行</span></div>'
+    + '<div class="byte" style="background:rgba(52,211,153,0.1);border-color:var(--green);padding:0.05rem 0.25rem">sound_id<span class="bl" style="color:var(--green);font-size:0.45rem">执行</span></div>'
+    + '<div class="byte" style="background:rgba(52,211,153,0.1);border-color:var(--green);padding:0.05rem 0.25rem">vib_id<span class="bl" style="color:var(--green);font-size:0.45rem">执行</span></div>'
+    + '<div class="byte" style="border-color:var(--gold);background:rgba(240,180,41,0.06);padding:0.05rem 0.25rem">weight<span class="bl" style="color:var(--gold);font-size:0.45rem">random</span></div>'
+    + '</div>';
 
   html += '<table class="mini-table"><tr><th>🤚 用户</th><th>😊 心情</th><th>🎬 动作</th><th>🔊</th><th>📳</th><th>🎲 木的 weight</th><th style="color:var(--gold)">🎲 金的 weight</th></tr>';
   const outData = [
