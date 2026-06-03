@@ -533,22 +533,34 @@ function renderOutput() {
   const ns = SAMPLE.newSnapshot;
   let html = '';
   
-  // ========== FLOW EXPLANATION ==========
-  html += '<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;font-size:0.6rem">';
-  html += '<div style="flex:1;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">📦 事件发生<br><span style="color:var(--muted)">设备检测到事件</span></div>';
-  html += '<div style="display:flex;align-items:center;color:var(--muted)">▶</div>';
-  html += '<div style="flex:1;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">🗳️ 查表匹配<br><span style="color:var(--muted)">过滤 event_id+emo+ctx</span></div>';
-  html += '<div style="display:flex;align-items:center;color:var(--muted)">▶</div>';
-  html += '<div style="flex:1;padding:0.4rem;background:rgba(255,193,7,0.1);border:1px solid var(--gold);border-radius:4px;text-align:center">🎲 加权随机<br><span style="color:var(--gold)">按 weight 选一行</span></div>';
-  html += '<div style="display:flex;align-items:center;color:var(--muted)">▶</div>';
-  html += '<div style="flex:1;padding:0.4rem;background:rgba(76,175,80,0.1);border:1px solid var(--green);border-radius:4px;text-align:center">🤖 执行动作<br><span style="color:var(--green)">舵机+声音+震动</span></div>';
+  // ========== OUR FLOW (NOT hardware's) ==========
+  html += '<div style="margin-bottom:0.5rem;padding:0.4rem;background:rgba(255,193,7,0.04);border:1px solid rgba(255,193,7,0.15);border-radius:6px">';
+  html += '<div style="font-size:0.6rem;font-weight:600;margin-bottom:0.3rem">🧠 我们做的事：从舵机大表里选中合适的动作</div>';
+  html += '<div style="font-size:0.55rem;color:var(--muted)">硬件有 131 个预设动作（舵机方向+角度+时间）。我们从里面挑「符合当前性格」的写到查表。</div></div>';
+
+  // ========== SELECTION FLOW ==========
+  html += '<div style="display:flex;gap:0.3rem;margin-bottom:0.5rem;font-size:0.55rem">';
+  html += '<div style="flex:1;padding:0.3rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">🎬 Beany 当前<br><span style="color:var(--gold)">木·青年·安心</span></div>';
+  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
+  html += '<div style="flex:1;padding:0.3rem;background:rgba(255,255,255,0.03);border-radius:4px;text-align:center">📋 舵机大表<br><span style="color:var(--muted)">131 个动作 ID</span></div>';
+  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
+  html += '<div style="flex:1;padding:0.3rem;background:rgba(76,175,80,0.08);border:1px solid var(--green);border-radius:4px;text-align:center">① 按 Stage 过滤<br><span style="color:var(--green)">留青年期动作</span></div>';
+  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
+  html += '<div style="flex:1;padding:0.3rem;background:rgba(76,175,80,0.08);border:1px solid var(--green);border-radius:4px;text-align:center">② 按 Event 过滤<br><span style="color:var(--green)">留摸头顶动作</span></div>';
+  html += '<div style="display:flex;align-items:center;color:var(--muted);font-size:0.7rem">→</div>';
+  html += '<div style="flex:1;padding:0.3rem;background:rgba(255,193,7,0.1);border:1px solid var(--gold);border-radius:4px;text-align:center">③ LLM 打分<br><span style="color:var(--gold)">选 2-3 候选+权重</span></div>';
   html += '</div>';
 
-  // ========== EXAMPLE ==========
-  html += '<div style="padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:0.5rem;font-size:0.6rem">';
-  html += '<b>示例：</b>用户<span style="color:var(--gold)">摸头顶</span> → event_id=0x01 · 设备当前情绪=开心 · context=0x00<br>';
-  html += '查表匹配：event_id=0x01 的行 + emotion=ANY(全都匹配) → <span style="color:var(--green)">命中 2 行</span><br>';
-  html += '加权随机：0.8 概率选 <span style="color:var(--gold)">抬头30°</span> · 0.2 概率选 <span style="color:var(--gold)">抬头60°</span></div>';
+  // ========== REAL EXAMPLE ==========
+  html += '<div style="margin-bottom:0.5rem;font-size:0.6rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px">';
+  html += '<b style="color:var(--gold)">🎯 真实选中过程：</b>当前 Beany = 木属性·青年·安心<br>';
+  html += '舵机大表里「摸头顶」×「青年期」的动作有 3 个：<br>';
+  html += ' · 动作ID 1 → 抬头30°500ms → "蹭蹭，舒适"<br>';
+  html += ' · 动作ID 3 → 抬头30°300ms → "短促蠕动（害怕）"<br>';
+  html += ' · 动作ID 4 → 抬头30°220ms → "好奇张望"<br>';
+  html += 'LLM 判断 Beany 当前安心+信赖 → 排除害怕(❌)和好奇(❌)，选中 <span style="color:var(--gold)">动作ID 1（蹭蹭舒适）</span><br>';
+  html += '备选：加一个动作ID 2（抬头40°撒娇），置信度偏低 → weight=51 vs weight=204<br>';
+  html += '<span style="color:var(--muted)">选中结果 → 写入查表（action_id=1, weight=204; action_id=2, weight=51）</span></div>';
 
   // ========== BYTES ==========
   html += `<div style="font-size:0.6rem;color:var(--muted);margin-bottom:0.2rem">PetGrowthSnapshot (11 字节)</div>
@@ -565,43 +577,24 @@ function renderOutput() {
     <div class="byte hl">${ns.milestone}<span class="bl">milestone</span></div>
   </div>`;
 
-  // ========== LOOKUP TABLE - HUMAN READABLE ==========
-  html += '<div style="margin-top:0.5rem;font-size:0.6rem;font-weight:600">📋 Beany 的反应规则表（PetBehaviorLookupTable）</div>';
-  html += '<div style="font-size:0.55rem;color:var(--muted);margin-bottom:0.3rem">revision=3 · 6 条规则 · 每行 7 字节 ｜ 设备每次翻这张表决定 Beany 怎么做</div>';
+  // ========== OUTPUT ==========
+  html += '<div style="margin-top:0.5rem;font-size:0.6rem;font-weight:600">📋 我们写进硬件的查表</div>';
+  html += '<div style="font-size:0.55rem;color:var(--muted);margin-bottom:0.3rem">从 131 个动作里选中了 6 条，按性格给了权重。硬件拿到后直接用。</div>';
   
-  // The rules explained simply
-  html += '<div style="margin-bottom:0.4rem;font-size:0.6rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px">';
-  html += '<div style="margin-bottom:0.2rem;color:var(--gold)">🤔 规则怎么看：</div>';
-  html += '<div style="display:flex;gap:0.4rem;align-items:flex-start">';
-  html += '<div style="flex:1"><b>左边：匹配条件</b><br><span style="color:var(--muted);font-size:0.55rem">什么情况用这条规则</span></div>';
-  html += '<div style="flex:0;color:var(--muted)">→</div>';
-  html += '<div style="flex:1"><b>右边：Beany 的反应</b><br><span style="color:var(--muted);font-size:0.55rem">做什么动作 + 放什么声音</span></div>';
-  html += '<div style="flex:0;color:var(--muted)">→</div>';
-  html += '<div style="flex:1"><b>概率权重</b><br><span style="color:var(--muted);font-size:0.55rem">这条规则被选中的概率</span></div>';
-  html += '</div></div>';
-  
-  // Table
-  html += '<table class="mini-table"><tr><th>🤚 当用户…</th><th>😊 且 Beany 心情</th><th>🌤️ 环境</th><th>🎬 Beany 动作</th><th>🔊 声音</th><th>📳 震动</th><th>🎲 选中概率</th></tr>';
-  const matchData = [
-    ['摸头顶','不管心情','不管环境','抬头30°轻蹭','surprised声', '无', '80%'],
-    ['摸头顶','不管心情','不管环境','抬头60°撒娇','surprised2声','无', '20%'],
-    ['摸肚子','开心','不管环境','低头30°摊开','trust声', '弱震', '70%'],
-    ['摸肚子','开心','不管环境','左转60°蹭手','trust2声', '弱震', '30%'],
-    ['被拿起','不管心情','不管环境','抬头90°张望','wakeup声', '无', '100%'],
-    ['被夸夸','不管心情','不管环境','抬头90°摇','wakeup声', '无', '100%'],
+  html += '<table class="mini-table"><tr><th>🤚 用户</th><th>😊 心情</th><th>🎬 选中动作</th><th>🔊</th><th>📳</th><th>🎲 概率</th><th>🧠 LLM 为什么这么选</th></tr>';
+  const outData = [
+    ['摸头顶','ANY','抬头30°轻蹭','snd1','无','80%','木属性·安心 → 选舒适蹭蹭'],
+    ['摸头顶','ANY','抬头40°撒娇','snd2','无','20%','备选，低概率增加多样性'],
+    ['摸肚子','开心','低头30°摊开','snd19','震1','70%','开心+信赖 → 摊开享受'],
+    ['摸肚子','开心','左转60°蹭手','snd20','震1','30%','备选，活泼回应'],
+    ['被拿起','ANY','抬头90°张望','snd31','无','100%','唯一符合的动作'],
+    ['平静语调','ANY','抬头90°醒','snd31','无','100%','唯一符合的动作'],
   ];
-  matchData.forEach((r, i) => {
-    const hl = r[6] === '100%' || r[6] === '80%' ? 'style="background:rgba(255,193,7,0.04)"' : '';
-    html += `<tr ${hl}><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><b>${r[3]}</b></td><td>${r[4]}</td><td>${r[5]}</td><td style="color:var(--gold);font-weight:600">${r[6]}</td></tr>`;
+  outData.forEach((r, i) => {
+    const hl = r[5] === '100%' || r[5] === '80%' ? 'style="background:rgba(255,193,7,0.04)"' : '';
+    html += `<tr ${hl}><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td style="color:var(--gold);font-weight:600">${r[5]}</td><td style="font-size:0.5rem;color:var(--muted)">${r[6]}</td></tr>`;
   });
   html += '</table>';
-  
-  // Weighted random explanation
-  html += '<div style="margin-top:0.3rem;padding:0.3rem 0.5rem;background:rgba(255,193,7,0.06);border:1px solid rgba(255,193,7,0.2);border-radius:6px;font-size:0.55rem">';
-  html += '<b>🎲 实际效果：</b>用户摸 Beany 头顶 10 次 → 约 8 次 <span style="color:var(--gold)">轻蹭抬头</span>，2 次 <span style="color:var(--gold)">撒娇大抬头</span>。<br>';
-  html += '摸肚子 10 次且 Beany 开心 → 约 7 次 <span style="color:var(--gold)">摊开享受</span>，3 次 <span style="color:var(--gold)">蹭手回应</span>。<br>';
-  html += '<span style="color:var(--muted)">这些规则由我们的 LLM 每天根据 Beany 性格生成，编译成 7 字节二进制行写入设备。</span>';  
-  html += '</div>';
   
   // ========== STORY ==========
   html += '<div style="margin-top:0.4rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px;font-size:0.6rem;color:var(--gold)">📖 story_id=0x0001 · App 本地存 · 不走 BLE · 设备不感知</div>';
@@ -636,7 +629,7 @@ const STEP_DESCS = [
   '模型把原始事件聚合成 8 个比例值（0-1），每个比例描述一天行为的一个维度——触摸多不多、声音互动几次、有没有换花样。',
   '每个比例跟 0.5 比，高了给某些元素投票，低了给另一些。得票最高的元素权重 +5%，最低的 -5%，相生关系再加 +1%。总和永远 100%。',
   '五行权重变化 × 映射矩阵 = 5-axis (依恋/信任/稳定/能量/好奇) 的变化量。这是 Beany 性格状态的实际更新。',
-  '写入新快照（11 字节）+ 新查表（每行 7 字节）。LLM 为常见 (event×emotion) 生成 2-3 个候选反应，按权重填表。设备下次命中时加权随机选一个执行。',
+  '写入新快照（11 字节）+ 输出查表。我们做的：从硬件舵机动作大表（131个ID）中，按 Beany 当前性格选中 1-3 个候选 + 打分归一化 → 写入查表的 random_weight。',
   '' // completed
 ];
 
