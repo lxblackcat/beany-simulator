@@ -1305,7 +1305,13 @@ function setTimelineClass(days, cls) {
   }
 }
 
+let rebirthDone = false;
+
 function selectOpt(id) {
+  if (id === 'reincarnate' && !rebirthDone) {
+    document.getElementById('opt-result').innerHTML = '⚠️ 必须先选「重生」清零后，才能使用转世。'; 
+    return; 
+  }
   document.querySelectorAll('.opt').forEach(o => o.style.borderColor = '');
   document.getElementById('opt-'+id).style.borderColor = 'var(--gold)';
   
@@ -1341,8 +1347,9 @@ function selectOpt(id) {
         clearInterval(clearId);
         setTimelineClass('', 'future');
         document.getElementById('tl-1').className = 'tl-day active';
+        rebirthDone = true;
         di.innerHTML = '<b>✅ 重生完成</b><br>权重: 金20 木20 水20 火20 土20 (均匀)<br>stage: 幼年 · revision: 0 · 全部历史已擦除';
-        document.getElementById('opt-result').innerHTML = '🔄 重生完成！从均匀权重（20%）重新培育。'; 
+        document.getElementById('opt-result').innerHTML = '🔄 重生完成！从均匀权重（20%）重新培育。<br><span style="color:var(--gold)">✨ 转世选项已解锁！点击转世卡片体验。</span>'; 
       }
     }, 150);
   }
@@ -1383,52 +1390,56 @@ function selectOpt(id) {
   }
   
   else if (id === 'reincarnate') {
+    // Show dual timelines: 前世(above) + 今生(below)
+    di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
+      + '<span style="color:var(--text-muted)">━━ 前世 ━━ 第一轮 · 已完成30天</span><br>'
+      + '<span style="font-size:0.5rem;color:var(--text-muted)">Day1→⋯→<span style="color:var(--gold)">Day27(巅峰)</span>→Day28→Day29→Day30→重生</span><br>'
+      + '<span style="color:var(--text-muted)">━━ 今生 ━━ 第二轮 · 重生后第10天</span><br>'
+      + '<span style="font-size:0.5rem;color:var(--text-muted)">Day1→⋯→Day10(当前) </span>'
+      + '<span style="color:var(--gold);font-size:0.6rem">← ✨ 继承前世 Day27 五行</span></div>';
+    
     let frame = 0;
     const totalFrames = 14;
     const clearId = setInterval(() => {
       frame++;
       if (frame <= 5) {
+        // Phase 1: scanning past life
         const dots = '.'.repeat(frame);
-        // Timeline scanning effect
-        const scanDay = frame * 5;
-        di.innerHTML = '<b>✨ 寻找前世记忆' + dots + '</b><br>扫描历史存档... Day ' + scanDay + ' ✓';
+        const scanDay = Math.min(frame * 6, 27);
+        di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
+          + '<span style="color:var(--text-muted)">━━ 前世 ━━ 扫描存档' + dots + '</span><br>'
+          + '<span style="font-size:0.5rem;color:var(--text-muted)">';
         for (let d = 1; d <= 30; d++) {
-          const el = document.getElementById('tl-' + d);
-          if (el) { el.className = d <= scanDay ? 'tl-day done' : 'tl-day future'; }
+          di.innerHTML += (d === scanDay ? '<span style="color:var(--gold);font-weight:600">■Day'+d+'</span> ' : (d <= scanDay ? '■ ' : '□ '));
+          if (d % 10 === 0) di.innerHTML += '<br>';
         }
-        document.getElementById('opt-result').textContent = '✨ 正在搜索历史最佳状态...';
+        di.innerHTML += '</span></div>';
+        document.getElementById('opt-result').textContent = '✨ 前世扫描中... Day ' + scanDay + ' ✓';
       } else if (frame <= 9) {
-        // Found Day 27 — highlight it
-        setTimelineClass('', 'future');
-        document.getElementById('tl-27').className = 'tl-day active';
-        for (let d = 1; d <= 27; d++) {
-          const el = document.getElementById('tl-' + d);
-          if (el && d !== 27) el.className = 'tl-day done';
-        }
-        
+        // Phase 2: found Day 27, restoring
         const p = (frame - 5) / 4;
-        const w = [80, 70, 60, 55, 50].map((v, i) => {
-          const restore = [110, 65, 85, 72, 45][i];
+        const w = [20, 20, 20, 20, 20].map((v, i) => {
+          const restore = [110, 65, 85, 72, 45][i]; // Day 27 weights from past life
           return Math.round(v + (restore - v) * Math.min(p, 1));
         });
-        di.innerHTML = '<b>✨ 恢复前世状态...</b><br>金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + '<br>stage: 青年 → <span style="color:var(--gold)">幼年</span> · 查表: <span style="color:var(--gold)">重新生成</span>';
-        document.getElementById('opt-result').textContent = '✨ 五行向量保留，阶段重置为幼年...';
+        di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
+          + '<span style="color:var(--gold)">✨ 前世 Day27 状态继承中...</span><br>'
+          + '<span style="color:var(--text-muted)">前世五行: <span style="color:var(--gold)">金110 木65 水85 火72 土45</span></span><br>'
+          + '<span style="color:var(--text-muted)">今生 ← 继承中: 金' + w[0] + ' 木' + w[1] + ' 水' + w[2] + ' 火' + w[3] + ' 土' + w[4] + '</span><br>'
+          + '<span style="font-size:0.5rem;color:var(--green)">✅ stage: 幼年 · 查表: 全新生成 · 里程碑/故事: 保留</span></div>';
+        document.getElementById('opt-result').textContent = '✨ 五行向量继承中... stage 重置为幼年...';
       } else {
-        // Complete: show Day 27-30 as timeline, future days locked
-        setTimelineClass('', 'end');
-        for (let d = 1; d <= 27; d++) {
-          const el = document.getElementById('tl-' + d);
-          if (el) el.className = 'tl-day done';
-        }
-        document.getElementById('tl-28').className = 'tl-day active';
-        document.getElementById('tl-29').className = 'tl-day future';
-        document.getElementById('tl-30').className = 'tl-day end';
-        
-        di.innerHTML = '<b>✨ 转世完成</b><br>五行: <span style="color:var(--gold)">金110 木65 水85 火72 土45</span> (Day 27 状态)<br>stage: 幼年 · 查表: 全新生成 ✅<br>里程碑/故事保留 · 继续最后 3 天 → Stable';
-        document.getElementById('opt-result').innerHTML = '✨ 转世完成！回到 Day 27 状态，stage 重置为幼年，查表全新生成。<br><span style="color:var(--muted);font-size:0.55rem">继续养成 3 天后进入 Stable 稳定期</span>';
+        // Phase 3: complete
+        di.innerHTML = '<div style="margin-bottom:0.3rem;font-size:0.6rem">'
+          + '<span style="color:var(--gold);font-weight:600">✅ 转世完成</span><br>'
+          + '<span style="color:var(--text-muted)">━━ 今生 ━━ 从 Day10 继续</span><br>'
+          + '<span style="font-size:0.5rem;color:var(--text-muted)">Day10(当前)→Day11→Day12→<span style="color:var(--gold)">最后3天故事</span>→<span style="color:var(--green)">Stable</span></span><br>'
+          + '<span style="font-size:0.5rem;color:var(--text-muted)">五行: <span style="color:var(--gold)">金110 木65 水85 火72 土45</span> (前世Day27状态)</span><br>'
+          + '<span style="font-size:0.5rem;color:var(--green)">stage: 幼年 · 查表: 全新生成 ✅ · 里程碑/故事: 保留</span></div>';
+        document.getElementById('opt-result').innerHTML = '✨ 转世完成！继承前世 Day27 的五行，重置为幼年，全新查表生成。<br><span style="color:var(--gold)">从 Day10 继续，最后 3 天 → Stable 稳定期</span>';
         clearInterval(clearId);
       }
-    }, 200);
+    }, 250);
   }
 }
 
