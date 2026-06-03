@@ -591,32 +591,42 @@ function renderOutput() {
     <div class="byte hl">${ns.milestone}<span class="bl">milestone</span></div>
   </div>`;
 
-  // ========== LOOKUP TABLE ==========
-  html += `<div style="margin-top:0.5rem;margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem">`;
-  html += `<span style="font-size:0.6rem;font-weight:600">📋 PetBehaviorLookupTable</span>`;
-  html += `<span style="font-size:0.5rem;color:var(--muted)">revision=3 · ${SAMPLE.lookupTable.length} 行 · 每行 7 字节</span>`;
-  html += `</div>`;
+  // ========== LOOKUP TABLE - HUMAN READABLE ==========
+  html += '<div style="margin-top:0.5rem;font-size:0.6rem;font-weight:600">📋 Beany 的反应规则表（PetBehaviorLookupTable）</div>';
+  html += '<div style="font-size:0.55rem;color:var(--muted);margin-bottom:0.3rem">revision=3 · 6 条规则 · 每行 7 字节 ｜ 设备每次翻这张表决定 Beany 怎么做</div>';
   
-  // Row 1: header + byte values
-  html += '<table class="mini-table"><tr><th>匹配条件</th><th colspan="3">执行指令</th><th>权重</th><th>字节</th></tr>';
-  html += '<tr><th style="font-size:0.5rem">事件·情绪·上下文</th><th>动作ID</th><th>声音</th><th>震动</th><th>0-255</th><th style="font-size:0.5rem">7B hex</th></tr>';
-  SAMPLE.lookupTable.forEach((row, idx) => {
-    const actionHex = parseInt(row.actionId, 16);
-    const soundHex = parseInt(row.sound, 16);
-    const weightHex = Math.round(row.w * 255);
-    // input_event_id, applies_emotion, applies_context, action_id, sound_id, vibration_id, random_weight
-    const evId = SAMPLE.events.find(e => e.name === row.ev)?.id || 1;
-    const bytes = [evId, 0, 0, actionHex, soundHex, row.vib, weightHex].map(b => b.toString(16).padStart(2,'0')).join(' ');
-    const highlight = row.w >= 0.8 ? 'style="background:rgba(255,193,7,0.06)"' : '';
-    html += `<tr ${highlight}><td>${row.ev} · ${row.emo} · ANY</td><td>${row.actionId}</td><td>${row.sound}</td><td>${row.vib}</td><td>${weightHex}</td><td style="font-size:0.5rem;font-family:monospace">${bytes}</td></tr>`;
+  // The rules explained simply
+  html += '<div style="margin-bottom:0.4rem;font-size:0.6rem;padding:0.4rem;background:rgba(255,255,255,0.03);border-radius:6px">';
+  html += '<div style="margin-bottom:0.2rem;color:var(--gold)">🤔 规则怎么看：</div>';
+  html += '<div style="display:flex;gap:0.4rem;align-items:flex-start">';
+  html += '<div style="flex:1"><b>左边：匹配条件</b><br><span style="color:var(--muted);font-size:0.55rem">什么情况用这条规则</span></div>';
+  html += '<div style="flex:0;color:var(--muted)">→</div>';
+  html += '<div style="flex:1"><b>右边：Beany 的反应</b><br><span style="color:var(--muted);font-size:0.55rem">做什么动作 + 放什么声音</span></div>';
+  html += '<div style="flex:0;color:var(--muted)">→</div>';
+  html += '<div style="flex:1"><b>概率权重</b><br><span style="color:var(--muted);font-size:0.55rem">这条规则被选中的概率</span></div>';
+  html += '</div></div>';
+  
+  // Table
+  html += '<table class="mini-table"><tr><th>🤚 当用户…</th><th>😊 且 Beany 心情</th><th>🌤️ 环境</th><th>🎬 Beany 动作</th><th>🔊 声音</th><th>📳 震动</th><th>🎲 选中概率</th></tr>';
+  const matchData = [
+    ['摸头顶','不管心情','不管环境','抬头30°轻蹭','surprised声', '无', '80%'],
+    ['摸头顶','不管心情','不管环境','抬头60°撒娇','surprised2声','无', '20%'],
+    ['摸肚子','开心','不管环境','低头30°摊开','trust声', '弱震', '70%'],
+    ['摸肚子','开心','不管环境','左转60°蹭手','trust2声', '弱震', '30%'],
+    ['被拿起','不管心情','不管环境','抬头90°张望','wakeup声', '无', '100%'],
+    ['被夸夸','不管心情','不管环境','抬头90°摇','wakeup声', '无', '100%'],
+  ];
+  matchData.forEach((r, i) => {
+    const hl = r[6] === '100%' || r[6] === '80%' ? 'style="background:rgba(255,193,7,0.04)"' : '';
+    html += `<tr ${hl}><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><b>${r[3]}</b></td><td>${r[4]}</td><td>${r[5]}</td><td style="color:var(--gold);font-weight:600">${r[6]}</td></tr>`;
   });
   html += '</table>';
   
-  // ========== weighted random explanation ==========
-  html += '<div style="margin-top:0.3rem;padding:0.3rem 0.4rem;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:4px;font-size:0.55rem">';
-  html += '<b>🎲 加权随机逻辑：</b>当设备检测到事件时，查表找出所有匹配的行。<br>';
-  html += '多行匹配时按 <span style="color:var(--gold)">random_weight</span> 比例随机选一行执行。权重全 0 = 均匀随机。<br>';
-  html += '例：摸头顶命中 2 行 (weight=204 和 weight=51)，硬件 80% 概率选抬头30°，20% 选抬头60°。';  
+  // Weighted random explanation
+  html += '<div style="margin-top:0.3rem;padding:0.3rem 0.5rem;background:rgba(255,193,7,0.06);border:1px solid rgba(255,193,7,0.2);border-radius:6px;font-size:0.55rem">';
+  html += '<b>🎲 实际效果：</b>用户摸 Beany 头顶 10 次 → 约 8 次 <span style="color:var(--gold)">轻蹭抬头</span>，2 次 <span style="color:var(--gold)">撒娇大抬头</span>。<br>';
+  html += '摸肚子 10 次且 Beany 开心 → 约 7 次 <span style="color:var(--gold)">摊开享受</span>，3 次 <span style="color:var(--gold)">蹭手回应</span>。<br>';
+  html += '<span style="color:var(--muted)">这些规则由我们的 LLM 每天根据 Beany 性格生成，编译成 7 字节二进制行写入设备。</span>';  
   html += '</div>';
   
   // ========== STORY ==========
